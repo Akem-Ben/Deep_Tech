@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import apiRouter from "./routes";
 // import { PORT } from "./configurations";
 import { createServer } from "http";
+import { connectDB } from "./configurations/database";
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 //Database
+connectDB()
 
 //routes
 app.use("/api", apiRouter);

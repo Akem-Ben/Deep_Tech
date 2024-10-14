@@ -1,5 +1,6 @@
 import { Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import {APP_SECRET} from '../configurations/envKeys';
 
 export const generalAuthFunction = async (
   request: JwtPayload,
@@ -24,7 +25,7 @@ export const generalAuthFunction = async (
       });
     }
 
-    const verifiedUser = jwt.verify(authorizationToken, `${process.env.APP_SECRET}`);
+    const verifiedUser = jwt.verify(authorizationToken, `${APP_SECRET}`);
 
     if (!verifiedUser) {
       return response.status(401).json({
@@ -34,7 +35,7 @@ export const generalAuthFunction = async (
     }
 
     request.user = verifiedUser;
-    
+
     next();
 
   } catch (error: any) {

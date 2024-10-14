@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile:watch": "tsc -w",
+    "compile": "tsc",
+    "test": "cross-env NODE_ENV=development --max-old-space-size=4096 jest -i --colors --verbose --detectOpenHandles --coverage --forceExit --testTimeout=500000 __tests__",
+    "test:watch": "cross-env NODE_ENV=development jest --watch",
+    "dev": "nodemon --exec"
   },
   "repository": {
     "type": "git",
@@ -23,7 +27,24 @@
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "cron": "^3.1.7"
+    "cron": "^3.1.7",
+    "cross-env": "^7.0.3",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "eslint": "^9.12.0",
+    "express": "^4.21.1",
+    "helmet": "^8.0.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "lodash.merge": "^4.6.2",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.15",
+    "nodemon": "^3.1.7",
+    "supertest": "^7.0.0",
+    "uuid": "^10.0.0",
+    "validator": "^13.12.0",
+    "xss-clean": "^0.1.4"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.0.3",

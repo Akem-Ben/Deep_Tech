@@ -1,0 +1,8 @@
+{
+    "watch": ["src", "package.json", ".env", "tsconfig.json"],
+    "ext": "ts,json",
+    "verbose": true,
+    "exec": "ts-node ./src/app.ts",
+    "ignore": ["*.test.js", "*.spec.js"]
+  }
+  

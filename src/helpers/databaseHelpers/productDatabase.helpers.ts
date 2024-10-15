@@ -63,6 +63,5 @@ const productDatabase = {
   };
 
 
-  export default {
-    productDatabase
-  }
+  export default productDatabase
+  

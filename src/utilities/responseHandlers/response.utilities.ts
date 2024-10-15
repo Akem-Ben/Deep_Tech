@@ -20,11 +20,10 @@ const responseHandler = (
 ) => {
 
   return response.status(statusCode).json({
-    status: statusCode === 201 ? "success" : "error",
+    status: statusCode === 201 || statusCode === 200 ? "success" : "error",
     message: message,
     data: data || null,
   });
-    // return response.status(statusCode).json({ status: "success", message, data });
 };
 
 export default {

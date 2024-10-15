@@ -7,6 +7,10 @@ const addItemToCart = async(request:JwtPayload, response:Response):Promise<any> 
 
     const user_id = request.user._id;
 
+    if(!user_id){
+        return responseUtilities.responseHandler(response, 'Unauthorized', 401);
+    }
+
     const body = {...request.body, user_id}
 
     const cart:any = await cartService.addItemToCartService(body)
@@ -19,6 +23,10 @@ const updateItemInCart = async(request:JwtPayload, response:Response):Promise<an
 
     const user_id = request.user._id;
 
+    if(!user_id){
+        return responseUtilities.responseHandler(response, 'Unauthorized', 401);
+    }
+
     const body = {...request.body, user_id}
 
     const cart:any = await cartService.updateCartItemService(body)
@@ -30,6 +38,10 @@ const updateItemInCart = async(request:JwtPayload, response:Response):Promise<an
 const deleteItemFromCart = async(request:JwtPayload, response:Response):Promise<any> => {
 
     const user_id = request.user._id;
+
+    if(!user_id){
+        return responseUtilities.responseHandler(response, 'Unauthorized', 401);
+    }
 
     const body = {...request.body, user_id}
 

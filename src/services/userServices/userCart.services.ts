@@ -1,5 +1,5 @@
 import { mailUtilities, errorUtilities } from "../../utilities";
-import { cartDatabase } from "../../helpers";
+import { cartDatabase, productDatabase } from "../../helpers";
 import { ResponseDetails } from "../../types/utilities.types";
 
 const addItemToCartService = errorUtilities.withErrorHandling(
@@ -10,6 +10,18 @@ const addItemToCartService = errorUtilities.withErrorHandling(
     };
 
     const { productId, quantity, user_id } = cartPayload;
+
+    const filter = {_id: productId}
+
+    let product = await productDatabase.getOne(filter, {_id: 1})
+
+    if(!product || product.availableQuantity === 0){
+      throw errorUtilities.createError("Product does not exist or product is sold out, please delete from Cart", 404)
+    }
+
+    if(!product.isAvailable || product.isBlacklisted){
+      throw errorUtilities.createError("Product is currently unavailable, please delete from Cart", 400)
+    }
 
     let cart = await cartDatabase.getOne({ userId: user_id });
 
@@ -44,6 +56,19 @@ const updateCartItemService = errorUtilities.withErrorHandling(
     };
 
     const { productId, quantity, user_id } = cartUpdatePayload;
+
+
+    const filter = {_id: productId}
+
+    let product = await productDatabase.getOne(filter, {_id: 1})
+
+    if(!product || product.availableQuantity === 0){
+      throw errorUtilities.createError("Product does not exist or product is sold out, please delete from Cart", 404)
+    }
+
+    if(!product.isAvailable || product.isBlacklisted){
+      throw errorUtilities.createError("Product is currently unavailable, please delete from Cart", 400)
+    }
 
     let cart = await cartDatabase.getOne({ userId: user_id });
 

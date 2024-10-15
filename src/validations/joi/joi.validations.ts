@@ -45,6 +45,10 @@ const cartSchema = Joi.object({
   quantity: Joi.number().integer().positive().required()
 });
 
+const cartItemDeleteSchema = Joi.object({
+  productId: Joi.string().required()
+})
+
 // const facebookLoginSchema = Joi.object({
 //   facebookId: Joi.string().required().email()
 // })
@@ -73,6 +77,7 @@ export default {
   userRegisterSchemaViaEmail,
   loginUserSchemaViaEmail,
   cartSchema,
+  cartItemDeleteSchema,
 //   facebookAuthSchema,
 //   facebookLoginSchema,
 //   resetPasswordInitiationSchema,

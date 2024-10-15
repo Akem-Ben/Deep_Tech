@@ -23,7 +23,7 @@ const userRegistrationService = errorUtilities.withErrorHandling(async (
       throw errorUtilities.createError("Invalid email", 400);
     }
 
-    const existingUser = await userDatabase.userDatabaseHelper.getOne({
+    const existingUser:any = await userDatabase.userDatabaseHelper.getOne({
       email,
     });
 
@@ -55,6 +55,8 @@ const userRegistrationService = errorUtilities.withErrorHandling(async (
     await mailUtilities.sendMail(newUser.email, "Click the button below to verify your account", "PLEASE VERIFY YOUR ACCOUNT", `${USERS_APP_BASE_URL}/verification/${verificationToken}`);
 
     const userWithoutPassword = await userDatabase.userDatabaseHelper.extractUserDetails(newUser)
+
+    delete userWithoutPassword.refreshToken
 
     responseHandler.statusCode = 201;
     responseHandler.message = "User registered successfully";
@@ -99,6 +101,8 @@ const adminRegistrationService = errorUtilities.withErrorHandling(async (userPay
     const newUser = await userDatabase.userDatabaseHelper.create(payload);
 
     const userWithoutPassword = await userDatabase.userDatabaseHelper.extractUserDetails(newUser)
+
+    delete userWithoutPassword.refreshToken
 
     responseHandler.statusCode = 201;
     responseHandler.message = "Admin registered successfully";
@@ -157,6 +161,8 @@ const userLogin = errorUtilities.withErrorHandling(async (loginPayload: Record<s
     await existingUser.save();
 
     const userWithoutPassword = await userDatabase.userDatabaseHelper.extractUserDetails(existingUser);
+
+    delete userWithoutPassword.refreshToken
 
     const dateDetails = generalHelpers.dateFormatter(new Date())
     const mailMessage = `Hi ${existingUser.name}, <br /> There was a login to your account on ${dateDetails.date} by ${dateDetails.time}. If you did not initiate this login, click the button below to restrict your account. If it was you, please ignore. The link will expire in one hour.`;

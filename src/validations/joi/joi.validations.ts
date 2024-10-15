@@ -40,12 +40,10 @@ const loginUserSchemaViaEmail = Joi.object({
     password: Joi.string().required()
 })
 
-// const facebookAuthSchema = Joi.object({
-//   email: Joi.string().required().email(),
-//   facebookId: Joi.string().required(),
-//   name: Joi.string().optional(),
-//   userId: Joi.string().optional()
-// })
+const cartSchema = Joi.object({
+  productId: Joi.string().required(),
+  quantity: Joi.number().integer().positive().required()
+});
 
 // const facebookLoginSchema = Joi.object({
 //   facebookId: Joi.string().required().email()
@@ -74,6 +72,7 @@ const loginUserSchemaViaEmail = Joi.object({
 export default {
   userRegisterSchemaViaEmail,
   loginUserSchemaViaEmail,
+  cartSchema,
 //   facebookAuthSchema,
 //   facebookLoginSchema,
 //   resetPasswordInitiationSchema,

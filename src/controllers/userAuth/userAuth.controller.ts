@@ -17,6 +17,7 @@ const userLoginWithEmail = async(request:Request, response:Response):Promise<any
    return responseUtilities.responseHandler(response, loggedInUser.message, loggedInUser.statusCode, loggedInUser.data)
 
 }
+
 export default {
     userRegisterWithEmail,
     userLoginWithEmail

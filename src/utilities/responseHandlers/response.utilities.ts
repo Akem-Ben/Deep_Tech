@@ -18,13 +18,13 @@ const responseHandler = (
   statusCode: number,
   data?: any,
 ) => {
-  if (statusCode === 200 || statusCode === 201) {
-    return response.status(statusCode).json({ status: "success", message, data });
-  } else if (statusCode === 400 || statusCode === 404 || statusCode === 401) {
-    return response.status(statusCode).json({ status: "error", message, data });
-  } else if (statusCode === 500) {
-    return response.status(statusCode).json({ status: "error", message: `Internal Server Error: ${message}`, data });
-  }
+
+  return response.status(statusCode).json({
+    status: statusCode === 201 ? "success" : "error",
+    message: message,
+    data: data || null,
+  });
+    // return response.status(statusCode).json({ status: "success", message, data });
 };
 
 export default {

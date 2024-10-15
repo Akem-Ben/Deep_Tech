@@ -4,24 +4,18 @@ import { responseUtilities } from '../../utilities';
 
 
 const userRegisterWithEmail = async(request:Request, response:Response):Promise<any> => {
-    try{
 
         const newUser:any = await userAuthService.userRegistrationService(request.body)
 
-
-            return responseUtilities.responseHandler(response, newUser.message, newUser.statusCode, newUser.data)
-
-    }catch(error:any){
-        return responseUtilities.responseHandler(response, error, 500)
-    }
+        return responseUtilities.responseHandler(response, newUser.message, newUser.statusCode, newUser.data)
 }
 
 const userLoginWithEmail = async(request:Request, response:Response):Promise<any> => {
-    try{
 
-    }catch(error:any){
-        return responseUtilities.responseHandler(response, error, 500)
-    }
+   const loggedInUser:any = await userAuthService.userLogin(request.body)
+
+   return responseUtilities.responseHandler(response, loggedInUser.message, loggedInUser.statusCode, loggedInUser.data)
+
 }
 export default {
     userRegisterWithEmail,

@@ -10,6 +10,7 @@ import dotenv from 'dotenv';
 import { createServer } from "http";
 import { connectDB } from "./configurations/database";
 import { PORT } from './configurations/envKeys';
+import { errorUtilities } from './utilities';
 
 const app = express();
 
@@ -60,12 +61,8 @@ app.get("/", (request: Request, response: Response) => {
 
 
 // Error handler
-app.use(
-  (error: Error, request: Request, response: Response, next: NextFunction) => {
-    console.error(error.stack);
-    response.status(500).send("Something broke!");
-  },
-);
+app.use(errorUtilities.globalErrorHandler);
+
 
 /**
  * Server

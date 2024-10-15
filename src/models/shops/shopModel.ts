@@ -25,7 +25,8 @@ enum Categories {
 const shopSchema = new mongoose.Schema({
   shopName: {
     type: String,
-    required: [true, "shop name is required"],
+    required: [true, "Shop name is required"],
+    unique: [true, "Shop name already in use"]
   },
 
   businessLegalName: {

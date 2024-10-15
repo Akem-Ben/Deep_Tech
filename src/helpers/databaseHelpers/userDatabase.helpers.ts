@@ -1,4 +1,4 @@
-import User from "models/users/usersModel";
+import User from "../../models/users/usersModel";
 
 const userDatabaseHelper = {
 

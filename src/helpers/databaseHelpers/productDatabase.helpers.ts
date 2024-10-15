@@ -1,4 +1,4 @@
-import Product from "models/products/productsModel";
+import Product from "../../models/products/productsModel";
 
 const productDatabase = {
 

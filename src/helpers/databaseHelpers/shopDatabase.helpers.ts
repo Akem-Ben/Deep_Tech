@@ -1,5 +1,4 @@
 import Shop from "../../models/shops/shopModel";
-import { Request, Response } from 'express';
 
 const shopDatabaseHelper = {
 

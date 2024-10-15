@@ -23,7 +23,7 @@ const responseHandler = (
   } else if (statusCode === 400 || statusCode === 404 || statusCode === 401) {
     return response.status(statusCode).json({ status: "error", message, data });
   } else if (statusCode === 500) {
-    return response.status(statusCode).json({ status: "error", message: 'Internal Server Error', data });
+    return response.status(statusCode).json({ status: "error", message: `Internal Server Error: ${message}`, data });
   }
 };
 

@@ -42,7 +42,7 @@ const validatePassword = async (
  */
 
 const generateTokens = async (
-  payload: Record<string, string>,
+  payload: Record<string, any>,
   expiresIn: string,
 ) => {
   return jwt.sign(payload, `${APP_SECRET}`, { expiresIn: expiresIn });

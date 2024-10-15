@@ -62,6 +62,4 @@ const shopDatabaseHelper = {
   }
 };
 
-export default {
-    shopDatabaseHelper
-}
+export default shopDatabaseHelper

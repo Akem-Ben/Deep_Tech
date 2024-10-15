@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import {APP_SECRET} from '../configurations/envKeys';
 import { generalHelpers, userDatabase } from '../helpers';
+import { errorUtilities } from '../utilities';
 
 export const generalAuthFunction = async (
   request: JwtPayload,
@@ -29,7 +30,7 @@ export const generalAuthFunction = async (
       });
     }
 
-    let verifiedUser;
+    let verifiedUser:any;
     try {
       verifiedUser = jwt.verify(authorizationToken, `${APP_SECRET}`);
     } catch (error: any) {
@@ -56,9 +57,16 @@ export const generalAuthFunction = async (
 
         const filter = { _id: refreshVerifiedUser.id };
 
-        const projection = { refreshToken: 1 };
+        const projection = { refreshToken: 1, isBlacklisted: 1 };
 
         const userDetails:any = await userDatabase.userDatabaseHelper.getOne(filter, projection)
+
+        if(userDetails.isBlacklisted){
+            return response.status(403).json({
+              status: 'error',
+              message: `Account Blocked, contact admin on info@naijamade.com`
+            })
+        }
 
         const compareRefreshTokens = refreshToken === userDetails.refreshToken
 
@@ -98,8 +106,21 @@ export const generalAuthFunction = async (
       });
     }
 
+    const filter = { _id: verifiedUser.id };
+
+    const projection = { isBlacklisted: 1 };
+
+    const userDetails:any = await userDatabase.userDatabaseHelper.getOne(filter, projection)
+
+    if(userDetails.isBlacklisted){
+        return response.status(403).json({
+          status: 'error',
+          message: `Account Blocked, contact admin on info@naijamade.com`
+        })
+    }
+
       request.user = verifiedUser;
-      
+
       return next();
 
   } catch (error: any) {

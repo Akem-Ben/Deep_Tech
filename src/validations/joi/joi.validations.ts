@@ -24,7 +24,7 @@ const inputValidator = (schema: Joi.Schema):any => {
     };
   };
 
-
+//User Auth
 const userRegisterSchemaViaEmail = Joi.object({
   email: Joi.string().required().email(),
   password: Joi.string().min(8).pattern(PASSWORD_PATTERN).required().messages({
@@ -40,6 +40,8 @@ const loginUserSchemaViaEmail = Joi.object({
     password: Joi.string().required()
 })
 
+
+//Cart
 const cartSchema = Joi.object({
   productId: Joi.string().required(),
   quantity: Joi.number().integer().positive().required()
@@ -49,6 +51,15 @@ const cartItemDeleteSchema = Joi.object({
   productId: Joi.string().required()
 })
 
+
+//Shops
+const createShopSchema = Joi.object({
+  shopName:  Joi.string().required(),
+  businessLegalName: Joi.string().required(),
+  businessLicenseNumber: Joi.string().required(),
+  shopCategory: Joi.string().required(),
+  legalAddressOfBusiness: Joi.string().required(),
+})
 // const facebookLoginSchema = Joi.object({
 //   facebookId: Joi.string().required().email()
 // })
@@ -78,6 +89,7 @@ export default {
   loginUserSchemaViaEmail,
   cartSchema,
   cartItemDeleteSchema,
+  createShopSchema,
 //   facebookAuthSchema,
 //   facebookLoginSchema,
 //   resetPasswordInitiationSchema,

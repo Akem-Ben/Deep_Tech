@@ -48,6 +48,29 @@ const addItemToCartService = errorUtilities.withErrorHandling(
   }
 );
 
+const userGetsCartItems = errorUtilities.withErrorHandling(
+
+  async (payload: Record<string, any>): Promise<any> => {
+    const responseHandler: ResponseDetails = {
+      statusCode: 0,
+      message: "",
+    };
+
+    const { userId } = payload;
+
+    let cart = await cartDatabase.getOne({ userId });
+
+    if(!cart){
+      cart = await cartDatabase.create({ userId, items: [] })
+    }
+
+    responseHandler.statusCode = 200;
+    responseHandler.message = "Cart retrieved successfully";
+    responseHandler.data = cart.items;
+    return responseHandler;
+
+  })
+
 const updateCartItemService = errorUtilities.withErrorHandling(
   async (cartUpdatePayload: Record<string, any>): Promise<any> => {
     const responseHandler: ResponseDetails = {
@@ -133,4 +156,5 @@ export default {
   addItemToCartService,
   updateCartItemService,
   deleteCartItemService,
+  userGetsCartItems
 };

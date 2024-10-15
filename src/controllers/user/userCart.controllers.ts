@@ -19,6 +19,19 @@ const addItemToCart = async(request:JwtPayload, response:Response):Promise<any> 
 }
 
 
+const getCartItems = async(request:JwtPayload, response:Response):Promise<any> => {
+
+    const userId = request.user._id;
+
+    if(!userId){
+        return responseUtilities.responseHandler(response, 'Unauthorized', 401);
+    }
+
+    const cart:any = await cartService.addItemToCartService(userId)
+
+    return responseUtilities.responseHandler(response, cart.message, cart.statusCode, cart.data)
+}
+
 const updateItemInCart = async(request:JwtPayload, response:Response):Promise<any> => {
 
     const user_id = request.user._id;
@@ -61,5 +74,6 @@ const deleteItemFromCart = async(request:JwtPayload, response:Response):Promise<
 export default {
     addItemToCart,
     updateItemInCart,
-    deleteItemFromCart
+    deleteItemFromCart,
+    getCartItems
 }

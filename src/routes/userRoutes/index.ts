@@ -13,6 +13,6 @@ router.post('/email-login', joiValidators.inputValidator(joiValidators.loginUser
 router.post('/add-cart-item', joiValidators.inputValidator(joiValidators.cartSchema), generalAuthFunction, cartController.addItemToCart)
 router.put('/update-cart-item', joiValidators.inputValidator(joiValidators.cartSchema), generalAuthFunction, cartController.updateItemInCart)
 router.delete('/delete-cart-item', joiValidators.inputValidator(joiValidators.cartItemDeleteSchema), generalAuthFunction, cartController.deleteItemFromCart)
-
+router.get('/get-cart', generalAuthFunction, cartController.getCartItems)
 
 export default router;

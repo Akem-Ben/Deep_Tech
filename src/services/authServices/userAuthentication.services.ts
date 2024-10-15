@@ -1,6 +1,6 @@
 import { ResponseDetails } from "../../types/utilities.types";
 import validator from "validator";
-import { userDatabase, generalHelpers } from "../../helpers";
+import { userDatabase, generalHelpers, cartDatabase } from "../../helpers";
 import { mailUtilities, errorUtilities } from "../../utilities";
 import { USERS_APP_BASE_URL } from '../../configurations/envKeys';
 
@@ -51,6 +51,8 @@ const userRegistrationService = errorUtilities.withErrorHandling(async (
       tokenPayload,
       "1h"
     );
+
+    await cartDatabase.create({ userId: newUser._id, items: [] });
 
     await mailUtilities.sendMail(newUser.email, "Click the button below to verify your account", "PLEASE VERIFY YOUR ACCOUNT", `${USERS_APP_BASE_URL}/verification/${verificationToken}`);
 

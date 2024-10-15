@@ -6,27 +6,30 @@ import bodyParser from "body-parser";
 import logger from "morgan";
 import cookieParser from "cookie-parser";
 import apiRouter from "./routes";
-// import { PORT } from "./configurations";
+import dotenv from 'dotenv';
 import { createServer } from "http";
 import { connectDB } from "./configurations/database";
+import { PORT } from './configurations/envKeys';
 
 const app = express();
 
 const server = createServer(app);
 
-// set security HTTP headers to disable 'powered by Express' header feature
+dotenv.config()
+
+// Set security HTTP headers to disable 'powered by Express' header feature
 app.disable("x-powered-by");
 
-// set security HTTP headers
+// Set security HTTP headers
 app.use(helmet());
 
-// parse urlencoded request body
+// Parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
 
-// compress response to increase speed
+// Compress response to increase speed
 app.use(compression());
 
-//set cors
+// Set Cors
 app.use(cors());
 
 
@@ -35,14 +38,22 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(cookieParser());
 
-//Database
-connectDB()
+// Database
+(async () => {
+  try {
+    await connectDB();
+    console.log('Application is running...');
+  } catch (error:any) {
+    console.error('Failed to connect to database:', error.message);
+    process.exit(1);
+  }
+})();
 
-//routes
+// Routes
 app.use("/api", apiRouter);
 
 
-//Health Check Endpoint
+// Health Check Endpoint
 app.get("/", (request: Request, response: Response) => {
   response.send("Welcome to PlentyChat API 👋");
 });
@@ -59,8 +70,8 @@ app.use(
 /**
  * Server
  */
-server.listen(3000, () => {
-  console.log(`server running on Port ${3000}`);
+server.listen(PORT, () => {
+  console.log(`server running on Port ${PORT}`);
 });
 
 export default app;

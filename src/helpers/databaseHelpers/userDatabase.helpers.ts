@@ -58,6 +58,24 @@ const userDatabaseHelper = {
     } catch (error:any) {
       throw new Error(`Error fetching Users: ${error.message}`);
     }
+  },
+
+  extractUserDetails: async(userData:Record<string, any>) => {
+    try{
+
+      return {
+        email: userData.email,
+        name: userData.name,
+        role: userData.role,
+        phone: userData.phone,
+        isVerified: userData.isVerified,
+        isBlacklisted: userData.isBlacklisted,
+        refreshToken: userData.refreshToken
+      }
+      
+    }catch (error:any) {
+      throw new Error(`Error fetching Users: ${error.message}`);
+    }
   }
 };
 

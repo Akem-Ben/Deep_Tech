@@ -16,6 +16,14 @@ const userRegisterWithEmail = async(request:Request, response:Response):Promise<
     }
 }
 
+const userLoginWithEmail = async(request:Request, response:Response):Promise<any> => {
+    try{
+
+    }catch(error:any){
+        return responseUtilities.responseHandler(response, error, 500)
+    }
+}
 export default {
-    userRegisterWithEmail
+    userRegisterWithEmail,
+    userLoginWithEmail
 }

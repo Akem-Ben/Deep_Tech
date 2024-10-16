@@ -27,7 +27,6 @@ const productDatabase = {
       }
     },
   
-    // Delete a single document based on criteria
     deleteOne: async (filter: any) => {
       try {
         return await Product.findOneAndDelete(filter);

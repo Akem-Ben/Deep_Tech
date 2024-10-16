@@ -1,6 +1,7 @@
 import { mailUtilities, errorUtilities } from "../../utilities";
 import { Request } from 'express';
 import {
+  productDatabase,
   shopDatabase,
   userDatabase,
 } from "../../helpers";
@@ -253,7 +254,12 @@ const deleteSingleVendorShop = errorUtilities.withErrorHandling(
         403
       );
     }
+
+    
     await shopDatabase.deleteOne(shopId);
+    
+    await productDatabase.deleteMany({shopId:shopId})
+
     responseHandler.statusCode = 200;
     responseHandler.message = "Shop deleted successfully";
     return responseHandler;
@@ -295,7 +301,11 @@ const deleteManyVendorShops = errorUtilities.withErrorHandling(
       );
     }
 
-    await shopDatabase.deleteMany({ _id: { $in: shopIds } });
+    const validShopIds = shops.map(shop => shop._id);
+
+    await productDatabase.deleteMany({ shopId: { $in: validShopIds } });
+
+    await shopDatabase.deleteMany({ _id: { $in: validShopIds } });
 
     responseHandler.statusCode = 200;
     responseHandler.message = "Shops deleted successfully";
@@ -322,28 +332,27 @@ const vendorDeactivateOrReactivateShop = errorUtilities.withErrorHandling(
     throw errorUtilities.createError('You are not the owner of this shop.', 403);
   }
 
-  if (!shop.isActive) {
-    throw errorUtilities.createError( 'Shop is already deactivated, you can reactivate it', 400);
-  }
+  let updatedShop: any;
+  let productStatus: boolean;
 
-  let updatedShop:any;
-
-  if(shop.isActive){
-
-  updatedShop = await shopDatabase.updateOne(
-    { _id: shopId },
-    { $set: { isActive: false } }
-  );
-
-  }else{
-
+  if (shop.isActive) {
+    updatedShop = await shopDatabase.updateOne(
+      { _id: shopId },
+      { $set: { isActive: false } }
+    );
+    productStatus = false;
+  } else {
     updatedShop = await shopDatabase.updateOne(
       { _id: shopId },
       { $set: { isActive: true } }
     );
-
+    productStatus = true;
   }
 
+  await productDatabase.updateMany(
+    { shopId: shopId },
+    { $set: { isActive: productStatus } }
+  );
 
   const extractedShop = await shopDatabase.extractShopDetails(updatedShop)
 

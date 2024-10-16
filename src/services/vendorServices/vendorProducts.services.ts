@@ -1,6 +1,6 @@
-import { mailUtilities, errorUtilities } from "../../utilities";
+import { errorUtilities } from "../../utilities";
 import { Request } from "express";
-import { productDatabase, shopDatabase, userDatabase } from "../../helpers";
+import { productDatabase, shopDatabase } from "../../helpers";
 import { ResponseDetails } from "../../types/utilities.types";
 
 const vendorCreateProductService = errorUtilities.withErrorHandling(
@@ -72,7 +72,7 @@ const vendorCreateProductService = errorUtilities.withErrorHandling(
 );
 
 const updateProductService = errorUtilities.withErrorHandling(
-    
+
   async (updatePayload: Record<string, any>): Promise<any> => {
     const responseHandler: ResponseDetails = {
       statusCode: 0,
@@ -91,16 +91,22 @@ const updateProductService = errorUtilities.withErrorHandling(
       );
     }
 
-    const { userId, shopId } = updatePayload;
+    const { userId, productId } = updatePayload;
 
-    const shop = await shopDatabase.getOne({ _id: shopId });
+    const product = await productDatabase.getOne({_id:productId})
+
+    if(!product){
+        throw errorUtilities.createError("Product not found", 404)
+    }
+
+    const shop = await shopDatabase.getOne({ _id: product.shopId });
 
     if (!shop) {
       throw errorUtilities.createError("Shop not found. Please try again", 404);
     }
 
     if (shop.ownerId !== userId) {
-      throw errorUtilities.createError("You can only update your shop(s)", 401);
+      throw errorUtilities.createError("You can only update products in your shop(s)", 400);
     }
 
     if (shop.isBlacklisted) {
@@ -110,42 +116,95 @@ const updateProductService = errorUtilities.withErrorHandling(
       );
     }
 
+    if (product.isBlacklisted) {
+        throw errorUtilities.createError(
+          "This product has been blocked. Please contact support on info@naijamade.com",
+          400
+        );
+      }
+
     let updateDetails: Record<string, any> = {};
 
-    if (updatePayload.shopName) {
-      updateDetails.shopName = updatePayload.shopName;
+    if (updatePayload.productName) {
+      updateDetails.productName = updatePayload.productName;
     }
 
-    if (updatePayload.shopCategory) {
-      updateDetails.shopCategory = updatePayload.shopCategory;
+    if (updatePayload.productCategory) {
+      updateDetails.productCategory = updatePayload.productCategory;
     }
 
-    if (updatePayload.legalAddressOfBusiness) {
-      updateDetails.legalAddressOfBusiness =
-        updatePayload.legalAddressOfBusiness;
+    if (updatePayload.cost) {
+      updateDetails.cost =
+        updatePayload.cost;
     }
 
-    const newShop: any = await shopDatabase.updateOne(
+    if (updatePayload.availableQuantity) {
+        updateDetails.availableQuantity =
+          updatePayload.availableQuantity;
+      }
+
+    const newProduct: any = await productDatabase.updateOne(
       {
-        _id: shopId,
+        _id: productId,
       },
       {
         $set: updateDetails,
       }
     );
 
-    const extractedShop = await shopDatabase.extractShopDetails(newShop);
+    const extractedShop = await productDatabase.extractProductDetails(newProduct);
 
     responseHandler.statusCode = 200;
-    responseHandler.message = "Shop updated successfully";
+    responseHandler.message = "Product updated successfully";
     responseHandler.data = {
-      shop: extractedShop,
+      product: extractedShop,
     };
     return responseHandler;
   }
 );
 
-const getVendorSingleShop = errorUtilities.withErrorHandling(
+const getVendorSingleProduct = errorUtilities.withErrorHandling(
+
+  async (queryDetails: Record<string, any>): Promise<any> => {
+
+    const responseHandler: ResponseDetails = {
+      statusCode: 0,
+      message: "",
+    };
+
+    const { productId } = queryDetails;
+
+    const product = await productDatabase.getOne(
+      { _id: productId },
+      {
+        productName: 1,
+        productCategory: 1,
+        shopId: 1,
+        cost: 1,
+        availableQuantity: 1,
+        isAvailable: 1,
+        productImage: 1,
+        isBlacklisted: 1
+      }
+    );
+
+    if (!product) {
+      throw errorUtilities.createError(
+        "Product not found. Please try again or contact admin",
+        404
+      );
+    }
+
+    responseHandler.statusCode = 200;
+    responseHandler.message = "Product fetched successfully";
+    responseHandler.data = {
+        product,
+    };
+    return responseHandler;
+  }
+);
+
+const getAllVendorProductsForAShop = errorUtilities.withErrorHandling(
   async (queryDetails: Record<string, any>): Promise<any> => {
     const responseHandler: ResponseDetails = {
       statusCode: 0,
@@ -154,8 +213,8 @@ const getVendorSingleShop = errorUtilities.withErrorHandling(
 
     const { shopId } = queryDetails;
 
-    const shop = await shopDatabase.getOne(
-      { _id: shopId },
+    const products = await productDatabase.getMany(
+      { shopId: shopId },
       {
         shopName: 1,
         businessLegalName: 1,
@@ -166,67 +225,30 @@ const getVendorSingleShop = errorUtilities.withErrorHandling(
       }
     );
 
-    if (!shop) {
+    if (!products || products.length === 0) {
       throw errorUtilities.createError(
-        "Shop not found. Please try again or contact admin",
+        "No Products found. Please try again or contact admin",
         404
       );
     }
 
     responseHandler.statusCode = 200;
-    responseHandler.message = "Shop fetched successfully";
+    responseHandler.message = "products fetched successfully";
     responseHandler.data = {
-      shop,
+        products,
     };
     return responseHandler;
   }
 );
 
-const getAllVendorShops = errorUtilities.withErrorHandling(
-  async (queryDetails: Record<string, any>): Promise<any> => {
-    const responseHandler: ResponseDetails = {
-      statusCode: 0,
-      message: "",
-    };
-
-    const { userId } = queryDetails;
-
-    const shops = await shopDatabase.getMany(
-      { ownerId: userId },
-      {
-        shopName: 1,
-        businessLegalName: 1,
-        businessLicenseNumber: 1,
-        shopCategory: 1,
-        legalAddressOfBusiness: 1,
-        isBlacklisted: 1,
-      }
-    );
-
-    if (!shops || shops.length === 0) {
-      throw errorUtilities.createError(
-        "No shops found. Please try again or contact admin",
-        404
-      );
-    }
-
-    responseHandler.statusCode = 200;
-    responseHandler.message = "Shops fetched successfully";
-    responseHandler.data = {
-      shops,
-    };
-    return responseHandler;
-  }
-);
-
-const deleteSingleVendorShop = errorUtilities.withErrorHandling(
+const deleteSingleVendorProduct = errorUtilities.withErrorHandling(
   async (deleteDetails: Record<string, any>): Promise<any> => {
     const responseHandler: ResponseDetails = {
       statusCode: 0,
       message: "",
     };
 
-    const { shopId, userId } = deleteDetails;
+    const { shopId, userId, productId } = deleteDetails;
 
     const shop = await shopDatabase.getOne(shopId);
 
@@ -235,73 +257,79 @@ const deleteSingleVendorShop = errorUtilities.withErrorHandling(
     }
     if (shop.ownerId !== userId) {
       throw errorUtilities.createError(
-        "You are not the owner of this shop.",
+        "You are not the owner of this shop. You cannot delete the product",
         403
       );
     }
-    await shopDatabase.deleteOne(shopId);
+
+    const product = await productDatabase.getOne({_id:productId})
+
+    if(!product){
+        throw errorUtilities.createError("Product not found", 404)
+    }
+    await productDatabase.deleteOne({_id:productId})
+
     responseHandler.statusCode = 200;
-    responseHandler.message = "Shop deleted successfully";
+    responseHandler.message = "Product deleted successfully";
     return responseHandler;
   }
 );
 
-const deleteManyVendorShops = errorUtilities.withErrorHandling(
+const deleteManyVendorProductsForAShop = errorUtilities.withErrorHandling(
   async (deleteDetails: Record<string, any>): Promise<any> => {
     const responseHandler: ResponseDetails = {
       statusCode: 0,
       message: "",
     };
 
-    const { userId, shopIds } = deleteDetails;
+    const { userId, shopId, productIds } = deleteDetails;
 
-    if (!shopIds || shopIds.length === 0) {
+    if (!productIds || productIds.length === 0) {
       throw errorUtilities.createError(
-        "No shops selected for deletion. Please provide shop IDs.",
-        400
-      );
-    }
-
-    const shops = await shopDatabase.getMany(
-      { _id: { $in: shopIds }, ownerId: userId },
-      { _id: 1 }
-    );
-
-    if (!shops || shops.length === 0) {
-      throw errorUtilities.createError(
-        "No valid shops found for the given user.",
+        "No Products selected for deletion. Please select Products.",
         404
       );
     }
 
-    if (shops.length !== shopIds.length) {
+    const shop = await shopDatabase.getOne(
+      { _id: shopId, ownerId: userId },
+      { _id: 1 }
+    );
+
+    if (!shop) {
       throw errorUtilities.createError(
-        "One or more shops are not owned by this user.",
-        403
+        "Shop not found.",
+        404
       );
     }
 
-    await shopDatabase.deleteMany({ _id: { $in: shopIds } });
+    await productDatabase.deleteMany({ _id: { $in: productIds } });
 
     responseHandler.statusCode = 200;
-    responseHandler.message = "Shops deleted successfully";
+    responseHandler.message = "Products deleted successfully";
     return responseHandler;
   }
 );
 
-const vendorDeactivateOrReactivateShop = errorUtilities.withErrorHandling(
+const vendorDeactivateOrReactivateProduct = errorUtilities.withErrorHandling(
   async (details: Record<string, any>): Promise<any> => {
     const responseHandler: ResponseDetails = {
       statusCode: 0,
       message: "",
     };
 
-    const { userId, shopId } = details;
+    const { userId, shopId, productId } = details;
 
-    const shop = await shopDatabase.getOne({ _id: shopId });
+    const product = await productDatabase.getOne({ _id: productId });
 
-    if (!shop) {
-      throw errorUtilities.createError("Shop not found", 404);
+    if (!product) {
+      throw errorUtilities.createError("Product not found", 404);
+    }
+
+    const shop = await shopDatabase.getOne({ _id: shopId })
+
+    if(!shop){
+        throw errorUtilities.createError("Shop not found", 404)
     }
 
     if (shop.ownerId !== userId) {
@@ -311,43 +339,36 @@ const vendorDeactivateOrReactivateShop = errorUtilities.withErrorHandling(
       );
     }
 
-    if (!shop.isActive) {
-      throw errorUtilities.createError(
-        "Shop is already deactivated, you can reactivate it",
-        400
-      );
-    }
+    let updatedProduct: any;
 
-    let updatedShop: any;
-
-    if (shop.isActive) {
-      updatedShop = await shopDatabase.updateOne(
-        { _id: shopId },
-        { $set: { isActive: false } }
+    if (product.isAvailable) {
+      updatedProduct = await productDatabase.updateOne(
+        { _id: productId },
+        { $set: { isAvailable: false } }
       );
     } else {
-      updatedShop = await shopDatabase.updateOne(
-        { _id: shopId },
-        { $set: { isActive: true } }
+      updatedProduct = await productDatabase.updateOne(
+        { _id: productId },
+        { $set: { isAvailable: true } }
       );
     }
 
-    const extractedShop = await shopDatabase.extractShopDetails(updatedShop);
+    const extractedProduct = await productDatabase.extractProductDetails(updatedProduct);
 
     responseHandler.statusCode = 200;
     responseHandler.message = `${
-      extractedShop.isActive
-        ? "Shop activated successfully"
-        : "Shop deactivated successfully"
+      extractedProduct.isAvailable
+        ? "Product activated successfully"
+        : "Product deactivated successfully"
     }`;
     responseHandler.data = {
-      shop: extractedShop,
+      product: extractedProduct,
     };
     return responseHandler;
   }
 );
 
-const updateShopImage = errorUtilities.withErrorHandling(
+const updateProductImage = errorUtilities.withErrorHandling(
   async (request: Request): Promise<any> => {
     const responseHandler: ResponseDetails = {
       statusCode: 0,
@@ -356,27 +377,36 @@ const updateShopImage = errorUtilities.withErrorHandling(
 
     const newImage = request?.file?.path;
 
-    const { shopId } = request.body;
-
     if (!newImage) {
-      throw errorUtilities.createError("Select an image please", 400);
+        throw errorUtilities.createError("Select an image please", 400);
+      }
+
+    const { productId } = request.body;
+
+    const productCheck = await productDatabase.getOne({ _id: productId }, { _id: 1 })
+
+    if(!productCheck){
+        throw errorUtilities.createError(
+            "Product not found",
+            404
+        )
     }
 
-    const newShop: any = await shopDatabase.updateOne(
+    const newProduct: any = await productDatabase.updateOne(
       {
-        _id: shopId,
+        _id: productId,
       },
       {
-        $set: { displayImage: newImage },
+        $set: { productImage: newImage },
       }
     );
 
-    const extractedShop = await shopDatabase.extractShopDetails(newShop);
+    const extractedShop = await productDatabase.extractProductDetails(newProduct);
 
     responseHandler.statusCode = 200;
     responseHandler.message = "Shop image changed successfully";
     responseHandler.data = {
-      shop: extractedShop,
+      product: extractedShop,
     };
     return responseHandler;
   }
@@ -385,10 +415,10 @@ const updateShopImage = errorUtilities.withErrorHandling(
 export default {
   vendorCreateProductService,
   updateProductService,
-  getVendorSingleShop,
-  getAllVendorShops,
-  deleteSingleVendorShop,
-  deleteManyVendorShops,
-  vendorDeactivateOrReactivateShop,
-  updateShopImage,
+  getVendorSingleProduct,
+  getAllVendorProductsForAShop,
+  deleteSingleVendorProduct,
+  deleteManyVendorProductsForAShop,
+  vendorDeactivateOrReactivateProduct,
+  updateProductImage,
 };

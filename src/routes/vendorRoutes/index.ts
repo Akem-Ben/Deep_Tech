@@ -6,6 +6,8 @@ import { cloudinaryUpload } from '../../utilities/';
 
 const router = express.Router();
 
+
+//Shop Routes
 router.post('/create-shop', joiValidators.inputValidator(joiValidators.createShopSchema), generalAuthFunction, cloudinaryUpload.single("displayImage"), vendorShopController.createShop)
 router.put('/update-shop', generalAuthFunction, vendorShopController.updateShop)
 router.get('/get-single-shop/:shopId', generalAuthFunction, vendorShopController.getVendorSingleShop)
@@ -14,5 +16,9 @@ router.delete('/delete-single-shop/:shopId', generalAuthFunction, vendorShopCont
 router.delete('/delete-many-shops', generalAuthFunction, vendorShopController.deleteManyVendorShops)
 router.post('/deactivate-shop/:shopId', generalAuthFunction, vendorShopController.changeVendorShopStatus)
 router.put('/update-shop-image', generalAuthFunction, cloudinaryUpload.single("displayImage"), vendorShopController.updateShopImage)
+
+
+//Product Routes
+
 
 export default router;

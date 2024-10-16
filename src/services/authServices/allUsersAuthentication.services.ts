@@ -42,7 +42,7 @@ const userRegistrationService = errorUtilities.withErrorHandling(async (
     const newUser = await userDatabase.userDatabaseHelper.create(payload);
 
     const tokenPayload = {
-      userId: newUser._id,
+      id: newUser._id,
       role: newUser.role,
       email: newUser.email,
     };
@@ -61,7 +61,7 @@ const userRegistrationService = errorUtilities.withErrorHandling(async (
     delete userWithoutPassword.refreshToken
 
     responseHandler.statusCode = 201;
-    responseHandler.message = "User registered successfully";
+    responseHandler.message = "User registered successfully. A verification mail has been sent to your account, please click on the link in the mail to verify your account. The link is valid for one hour only. Thank you.";
     responseHandler.data = userWithoutPassword;
     return responseHandler;
 
@@ -113,6 +113,8 @@ const adminRegistrationService = errorUtilities.withErrorHandling(async (userPay
 
 });
 
+
+
 const userLogin = errorUtilities.withErrorHandling(async (loginPayload: Record<string, any>) => {
 
     const responseHandler: ResponseDetails = {
@@ -150,6 +152,7 @@ const userLogin = errorUtilities.withErrorHandling(async (loginPayload: Record<s
     const tokenPayload = {
       id: existingUser._id,
       email: existingUser.email,
+      role: existingUser.role
     };
 
     const accessToken = await generalHelpers.generateTokens(tokenPayload, "2h");
@@ -188,8 +191,82 @@ const userLogin = errorUtilities.withErrorHandling(async (loginPayload: Record<s
 
 });
 
+
+const verifyUserAccount = errorUtilities.withErrorHandling(async (verificationToken: string): Promise<any> => {
+
+  const responseHandler: ResponseDetails = {
+    statusCode: 0,
+    message: "",
+  };
+
+  const verify: any = await generalHelpers.verifyRegistrationToken(verificationToken);
+
+  const user = await userDatabase.userDatabaseHelper.getOne({_id:verify.id});
+
+  if (!user) {
+    throw errorUtilities.createError("User not found", 404);
+  }
+
+  if (user.isVerified) {
+    throw errorUtilities.createError("User is already verified", 400);
+  }
+
+  await userDatabase.userDatabaseHelper.updateOne(
+    { _id:user._id }, { $set: { isVerified: true } }
+  )
+
+  responseHandler.statusCode = 200;
+  responseHandler.message = "User verified successfully";
+
+  return responseHandler;
+
+});
+
+
+const resendVerificationLinkService = errorUtilities.withErrorHandling(async (email: string): Promise<any> => {
+
+  const responseHandler: ResponseDetails = {
+    statusCode: 0,
+    message: "",
+  };
+
+  const user = await userDatabase.userDatabaseHelper.getOne(email);
+
+  if (!user) {
+    throw errorUtilities.createError(`${email} does not exist`, 404);
+  }
+
+  if (user.isVerified) {
+    throw errorUtilities.createError("User is already verified", 400);
+  }
+
+  const tokenPayload = {
+    id: user._id,
+    role: user.role,
+    email: user.email,
+  };
+
+  const verificationToken = await generalHelpers.generateTokens(
+    tokenPayload,
+    "1h"
+  );
+  await mailUtilities.sendMail(user.email, "Click the button below to verify your account", "PLEASE VERIFY YOUR ACCOUNT", `${USERS_APP_BASE_URL}/verification/${verificationToken}`);
+
+  const userWithoutPassword = await userDatabase.userDatabaseHelper.extractUserDetails(user)
+
+  delete userWithoutPassword.refreshToken
+
+  responseHandler.statusCode = 200;
+  responseHandler.message = "A verification mail has been sent to your account, please click on the link in the mail to verify your account. The link is valid for one hour only. Thank you.";
+  responseHandler.data = userWithoutPassword;
+  return responseHandler;
+
+})
+
 export default {
   userRegistrationService,
   adminRegistrationService,
   userLogin,
+  verifyUserAccount,
+  resendVerificationLinkService
 };

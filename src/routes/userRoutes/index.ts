@@ -8,6 +8,9 @@ const router = express.Router();
 //User Email Authentications
 router.post('/email-signup', joiValidators.inputValidator(joiValidators.userRegisterSchemaViaEmail), userAuthController.userRegisterWithEmail)
 router.post('/email-login', joiValidators.inputValidator(joiValidators.loginUserSchemaViaEmail), userAuthController.userLoginWithEmail)
+router.get('/verification/:token', userAuthController.userVerifiesAccountWithEmail)
+router.post('/resend-verification-link', userAuthController.userResendsVerificationLink)
+
 
 //User Cart Operations
 router.post('/add-cart-item', joiValidators.inputValidator(joiValidators.cartSchema), generalAuthFunction, cartController.addItemToCart)

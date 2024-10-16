@@ -1,4 +1,4 @@
-import userAuthService from './authServices/userAuthentication.services';
+import userAuthService from './authServices/allUsersAuthentication.services';
 import cartService from './userServices/userCart.services';
 import vendorShopService from './vendorServices/vendorShop.services';
 export {

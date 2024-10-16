@@ -59,6 +59,25 @@ const productDatabase = {
       } catch (error:any) {
         throw new Error(`Error fetching Products: ${error.message}`);
       }
+    },
+
+    extractProductDetails: async(productData:Record<string, any>) => {
+      try{
+  
+        return {
+          productName: productData.productName,
+          productCategory: productData.productCategory,
+          shopId: productData.shopId,
+          cost: productData.cost,
+          availableQuantity: productData.availableQuantity,
+          isAvailable: productData.isAvailable,
+          productImage: productData.productImage,
+          isBlacklisted: productData.isBlacklisted,
+        }
+        
+      }catch (error:any) {
+        throw new Error(`Error fetching Users: ${error.message}`);
+      }
     }
   };
 

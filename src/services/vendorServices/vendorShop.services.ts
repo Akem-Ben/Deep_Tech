@@ -1,4 +1,5 @@
 import { mailUtilities, errorUtilities } from "../../utilities";
+import { Request } from 'express';
 import {
   shopDatabase,
   userDatabase,
@@ -6,7 +7,9 @@ import {
 import { ResponseDetails } from "../../types/utilities.types";
 
 const createVendorShopService = errorUtilities.withErrorHandling(
-  async (createShopPayload: Record<string, any>): Promise<any> => {
+
+  async (createShopPayload: Record<string, any>, request:Request): Promise<any> => {
+
     const responseHandler: ResponseDetails = {
       statusCode: 0,
       message: "",
@@ -18,7 +21,7 @@ const createVendorShopService = errorUtilities.withErrorHandling(
       businessLicenseNumber,
       shopCategory,
       legalAddressOfBusiness,
-      userId,
+      userId
     } = createShopPayload;
 
     const user = await userDatabase.userDatabaseHelper.getOne({ _id: userId });
@@ -48,6 +51,7 @@ const createVendorShopService = errorUtilities.withErrorHandling(
       shopCategory,
       legalAddressOfBusiness,
       ownerId: userId,
+      displayImage: request?.file?.path
     };
 
     const newShop = await shopDatabase.create(payload);
@@ -299,7 +303,7 @@ const deleteManyVendorShops = errorUtilities.withErrorHandling(
   }
 );
 
-const vendorDeactivateShop = errorUtilities.withErrorHandling(
+const vendorDeactivateOrReactivateShop = errorUtilities.withErrorHandling(
   async (details: Record<string, any>): Promise<any> => {
     const responseHandler: ResponseDetails = {
       statusCode: 0,
@@ -322,20 +326,69 @@ const vendorDeactivateShop = errorUtilities.withErrorHandling(
     throw errorUtilities.createError( 'Shop is already deactivated, you can reactivate it', 400);
   }
 
-  const updatedShop:any = await shopDatabase.updateOne(
+  let updatedShop:any;
+
+  if(shop.isActive){
+
+  updatedShop = await shopDatabase.updateOne(
     { _id: shopId },
     { $set: { isActive: false } }
   );
 
+  }else{
+
+    updatedShop = await shopDatabase.updateOne(
+      { _id: shopId },
+      { $set: { isActive: true } }
+    );
+
+  }
+
+
   const extractedShop = await shopDatabase.extractShopDetails(updatedShop)
 
   responseHandler.statusCode = 200;
-  responseHandler.message = "Shop deactivated successfully";
+  responseHandler.message = `${extractedShop.isActive ? "Shop activated successfully" : "Shop deactivated successfully"}`;
   responseHandler.data = {
     shop: extractedShop,
   }
   return responseHandler;
 });
+
+const updateShopImage = errorUtilities.withErrorHandling(
+  async (request:Request): Promise<any> => {
+    const responseHandler: ResponseDetails = {
+      statusCode: 0,
+      message: "",
+    };
+
+    const newImage = request?.file?.path
+
+    const { shopId } = request.body
+
+    if (!newImage) {
+      throw errorUtilities.createError("Select an image please", 400);
+    }
+
+    const newShop:any = await shopDatabase.updateOne(
+      {
+        _id: shopId,
+      },
+      {
+        $set: { displayImage : newImage }
+      }
+    );
+
+    const extractedShop = await shopDatabase.extractShopDetails(newShop)
+
+    responseHandler.statusCode = 200;
+    responseHandler.message = "Shop image changed successfully";
+    responseHandler.data = {
+      shop: extractedShop,
+    };
+    return responseHandler;
+  }
+);
 
 
 export default {
@@ -345,5 +398,6 @@ export default {
   getAllVendorShops,
   deleteSingleVendorShop,
   deleteManyVendorShops,
-  vendorDeactivateShop
+  vendorDeactivateOrReactivateShop,
+  updateShopImage
 };

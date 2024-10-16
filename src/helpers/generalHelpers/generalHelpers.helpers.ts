@@ -2,6 +2,7 @@ import brcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { APP_SECRET } from '../../configurations/envKeys';
 import { ResponseDetails } from '../../types/utilities.types';
+import { errorUtilities } from '../../utilities';
 
 /**
  * Hash Password:
@@ -56,21 +57,17 @@ const generateTokens = async (
  * @throws {Error} - Throws an error if there is an issue with verifying the token.
  */
 
-// const verifyToken = async (token: string) => {
-//   try {
-//     return jwt.verify(token, `${APP_SECRET}`);
-//   } catch (error: any) {
-//     if (error.message === 'jwt expired') {
-//       let responseDetails: ResponseDetails = {
-//         statusCode: 0,
-//         message: '',
-//       };
-//       responseDetails.statusCode = 500;
-//       responseDetails.message = 'Please request verification email again';
-//       return responseDetails;
-//     }
-//   }
-// }; 
+const verifyRegistrationToken = async (token: string): Promise<any> => {
+  try {
+    return jwt.verify(token, `${APP_SECRET}`);
+  } catch (error: any) {
+    if (error.message === 'jwt expired') {
+      throw errorUtilities.createError('Please request a new verification email', 401);
+    }
+    throw errorUtilities.createUnknownError(error);
+  }
+};
+
 
 const dateFormatter = (dateString: Date) => {
   const year = dateString.getFullYear();
@@ -141,5 +138,6 @@ export default {
   validatePassword,
   generateTokens,
   refreshUserToken,
-  dateFormatter
+  dateFormatter,
+  verifyRegistrationToken
 };

@@ -13,7 +13,7 @@ const createShop = async(request:JwtPayload, response:Response):Promise<any> => 
 
     const body = {...request.body, user_id}
 
-    const shop:any = await vendorShopService.createVendorShopService(body)
+    const shop:any = await vendorShopService.createVendorShopService(body, request)
 
     return responseUtilities.responseHandler(response, shop.message, shop.statusCode, shop.data)
 }
@@ -124,7 +124,7 @@ const updateShop = async (request: JwtPayload, response: Response): Promise<any>
     );
   };
   
-  const deactivateVendorShop = async (request: JwtPayload, response: Response): Promise<any> => {
+  const changeVendorShopStatus = async (request: JwtPayload, response: Response): Promise<any> => {
     const userId = request.user._id;
     const { shopId } = request.params;
 
@@ -137,7 +137,7 @@ const updateShop = async (request: JwtPayload, response: Response): Promise<any>
     shopId
   };
 
-  const result = await vendorShopService.vendorDeactivateShop(deactivateDetails);
+  const result = await vendorShopService.vendorDeactivateOrReactivateShop(deactivateDetails);
 
   return responseUtilities.responseHandler(
     response, 
@@ -147,6 +147,24 @@ const updateShop = async (request: JwtPayload, response: Response): Promise<any>
   );
   }
 
+
+  const updateShopImage = async (request: JwtPayload, response: Response): Promise<any> => {
+    const user_id = request.user._id;
+    
+    if (!user_id) {
+      return responseUtilities.responseHandler(response, 'Unauthorized', 401);
+    }
+  
+    const updatedShopImage = await vendorShopService.updateShopImage(request);
+  
+    return responseUtilities.responseHandler(
+      response, 
+      updatedShopImage.message, 
+      updatedShopImage.statusCode, 
+      updatedShopImage.data
+    );
+  };
+
 export default {
     createShop,
     updateShop,
@@ -154,5 +172,6 @@ export default {
     getAllVendorShops,
     deleteSingleVendorShop,
     deleteManyVendorShops,
-    deactivateVendorShop
+    changeVendorShopStatus,
+    updateShopImage
 }

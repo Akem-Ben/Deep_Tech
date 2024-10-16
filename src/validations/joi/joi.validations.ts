@@ -59,6 +59,7 @@ const createShopSchema = Joi.object({
   businessLicenseNumber: Joi.string().required(),
   shopCategory: Joi.string().required(),
   legalAddressOfBusiness: Joi.string().required(),
+  displayImage: Joi.string().required()
 })
 // const facebookLoginSchema = Joi.object({
 //   facebookId: Joi.string().required().email()

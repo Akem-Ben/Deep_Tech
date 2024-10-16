@@ -56,6 +56,11 @@ const productSchema = new mongoose.Schema({
     default: true
   },
 
+  productImage: {
+    type: String,
+    required: [true, "Product image required"]
+  },
+
   isBlacklisted: {
     type: Boolean,
     default: false

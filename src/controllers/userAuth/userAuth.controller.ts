@@ -36,7 +36,49 @@ const userLoginWithEmail = async (
   );
 };
 
+const userVerifiesAccountWithEmail = async (
+  request: Request,
+  response: Response
+): Promise<any> => {
+  
+  const { token } = request.params;
+
+  const verification = await userAuthService.verifyUserAccount(token)
+
+  return responseUtilities.responseHandler(
+    response,
+    verification.message,
+    verification.statusCode,
+    verification.data
+  );
+
+};
+
+const userResendsVerificationLink = async (
+  request: Request,
+  response: Response
+): Promise<any> => {
+
+  const { email } = request.body;
+
+  if(!email || email === ''){
+    return responseUtilities.responseHandler(response, 'Email required', 400);
+  }
+
+  const resendLink = await userAuthService.resendVerificationLinkService(email)
+
+  return responseUtilities.responseHandler(
+    response,
+    resendLink.message,
+    resendLink.statusCode,
+    resendLink.data
+  );
+
+}
+
 export default {
   userRegisterWithEmail,
   userLoginWithEmail,
+  userVerifiesAccountWithEmail,
+  userResendsVerificationLink
 };

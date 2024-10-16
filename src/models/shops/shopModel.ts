@@ -56,6 +56,11 @@ const shopSchema = new mongoose.Schema({
     required: [true, "legal address of business is required"],
   },
 
+  displayImage: {
+    type: String,
+    required: [true, "A shop display image is required"]
+  },
+
   isActive: {
     type: Boolean,
     default: true,

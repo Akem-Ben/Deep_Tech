@@ -48,7 +48,7 @@ const addItemToCartService = errorUtilities.withErrorHandling(
   }
 );
 
-const userGetsCartItems = errorUtilities.withErrorHandling(
+const getsUserCartItemsService = errorUtilities.withErrorHandling(
 
   async (payload: Record<string, any>): Promise<any> => {
     const responseHandler: ResponseDetails = {
@@ -156,5 +156,5 @@ export default {
   addItemToCartService,
   updateCartItemService,
   deleteCartItemService,
-  userGetsCartItems
+  getsUserCartItemsService
 };

@@ -56,6 +56,11 @@ const shopSchema = new mongoose.Schema({
     required: [true, "legal address of business is required"],
   },
 
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
+
   isBlacklisted: {
     type: Boolean,
     default: false,

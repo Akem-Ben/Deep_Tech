@@ -59,6 +59,26 @@ const shopDatabaseHelper = {
     } catch (error:any) {
       throw new Error(`Error fetching shops: ${error.message}`);
     }
+  },
+
+
+  extractShopDetails: async(shopData:Record<string, any>) => {
+    try{
+
+      return {
+        shopName: shopData.shopName,
+        businessLegalName: shopData.businessLegalName,
+        businessLicenseNumber: shopData.businessLicenseNumber,
+        shopCategory: shopData.shopCategory,
+        ownerId: shopData.ownerId,
+        legalAddressOfBusiness: shopData.legalAddressOfBusiness,
+        isActive: shopData.isActive,
+        isBlacklisted: shopData.isBlacklisted,
+      }
+      
+    }catch (error:any) {
+      throw new Error(`Error fetching Users: ${error.message}`);
+    }
   }
 };
 

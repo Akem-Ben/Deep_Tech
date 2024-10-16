@@ -2,7 +2,7 @@ import express from 'express';
 import { joiValidators } from '../../validations';
 import { generalAuthFunction } from '../../middlewares/authorization.middleware';
 import { vendorShopController } from '../../controllers/index';
-import { cloudinaryUpload } from '../../utilities/';
+import { cloudinaryUpload } from '../../utilities';
 
 const router = express.Router();
 

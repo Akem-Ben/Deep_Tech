@@ -38,9 +38,12 @@ const updateProduct = async (
     return responseUtilities.responseHandler(response, "Unauthorized", 401);
   }
 
+  const { productId } = request.params
+
   const updatedProduct = await vendorProductServices.updateProductService({
     ...request.body,
     userId,
+    productId
   });
 
   return responseUtilities.responseHandler(
@@ -109,7 +112,7 @@ const allVendorProductsForAShop = async (
   );
 };
 
-const deleteSingleVendorShop = async (
+const deleteVendorSingleProduct = async (
   request: JwtPayload,
   response: Response
 ): Promise<any> => {
@@ -203,7 +206,7 @@ export default {
   updateProduct,
   vendorSingleProduct,
   allVendorProductsForAShop,
-  deleteSingleVendorShop,
+  deleteVendorSingleProduct,
   deleteManyVendorShopProducts,
   changeVendorProductStatus,
   updateVendorProductImage,

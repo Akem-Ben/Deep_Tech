@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import { APP_SECRET } from '../../configurations/envKeys';
 import { ResponseDetails } from '../../types/utilities.types';
 import { errorUtilities } from '../../utilities';
+import { QueryParameters } from '../../types/helpers.types';
+import { FilterQuery } from 'mongoose';
 
 /**
  * Hash Password:
@@ -132,6 +134,62 @@ const refreshUserToken = async (
   };
 
 
+  //This function is used to manage queries (request.query) for the application  
+  export const queryFilter = async (queryItem: QueryParameters) => {
+
+    const query: FilterQuery<any> = {};
+  
+    if (queryItem?.shopName) {
+      query["shopName"] = queryItem.shopName.toLowerCase();
+    }
+    
+    if (queryItem?.shopCategory) {
+      query["shopCategory"] = queryItem.shopCategory;
+    }
+    
+    if (queryItem?.productName) {
+      query["productName"] = queryItem.productName;
+    }
+    
+    if (queryItem?.productCategory) {
+      query["productCategory"] = queryItem.productCategory;
+    }
+    
+    if (queryItem?.min_cost && queryItem?.max_cost) {
+      query.cost = {
+        $gte: queryItem.min_cost,
+        $lte: queryItem.max_cost
+      };
+    } else if (queryItem?.min_cost) {
+      query.cost = {
+        $gte: queryItem.min_cost
+      };
+    } else if (queryItem?.max_cost) {
+      query.cost = {
+        $lte: queryItem.max_cost
+      };
+    } else if (queryItem?.exact_cost) {
+      query.cost = queryItem.exact_cost;
+    }
+
+    if (queryItem?.start_date && queryItem?.end_date) {
+      query.createdAt = {
+        $gte: new Date(queryItem.start_date),
+        $lte: new Date(queryItem.end_date)
+      };
+    } else if (queryItem?.start_date) {
+      query.createdAt = {
+        $gte: new Date(queryItem.start_date)
+      };
+    } else if (queryItem?.end_date) {
+      query.createdAt = {
+        $lte: new Date(queryItem.end_date)
+      };
+    }
+  
+    return query;
+  };
+  
 
 export default {
   hashPassword,

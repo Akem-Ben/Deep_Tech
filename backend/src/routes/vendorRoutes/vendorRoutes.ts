@@ -20,7 +20,7 @@ router.put('/update-shop-image', generalAuthFunction, rolePermit([Roles.Vendor])
 
 
 //Product Routes
-router.post('/create-product', generalAuthFunction, rolePermit([Roles.Vendor]), cloudinaryUpload.single("productImage"), vendorProductController.createProduct)
+router.post('/create-product', joiValidators.inputValidator(joiValidators.createProductSchema), generalAuthFunction, rolePermit([Roles.Vendor]), cloudinaryUpload.single("productImage"), vendorProductController.createProduct)
 router.put('/update-product/:productId', generalAuthFunction, rolePermit([Roles.Vendor]), vendorProductController.updateProduct)
 router.get('/get-single-product/:productId', generalAuthFunction, rolePermit([Roles.Vendor]), vendorProductController.vendorSingleProduct)
 router.get('/get-all-products/:shopId', generalAuthFunction, rolePermit([Roles.Vendor]), vendorProductController.allVendorProductsForAShop)

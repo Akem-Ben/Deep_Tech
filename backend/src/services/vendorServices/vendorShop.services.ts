@@ -34,6 +34,12 @@ const createVendorShopService = errorUtilities.withErrorHandling(
       );
     }
 
+    if(user.noOfShops == 4){
+      throw errorUtilities.createError(
+        "A vendor cannot have more than 4 shops",
+        400
+      );
+    }
     const filter = { shopName };
 
     let findShop = await shopDatabase.getOne(filter, { shopName: 1 });
@@ -63,7 +69,11 @@ const createVendorShopService = errorUtilities.withErrorHandling(
       "SHOP CREATED"
     );
 
-    const updatedUser:any = await userDatabase.userDatabaseHelper.updateOne(
+    let updatedUser:any;
+
+    if(user.role === 'User'){
+
+     updatedUser = await userDatabase.userDatabaseHelper.updateOne(
       {
         _id: userId,
       },
@@ -74,7 +84,25 @@ const createVendorShopService = errorUtilities.withErrorHandling(
       }
     );
 
+  }
+
+    let noOfShops = user.noOfShops
+
+    noOfShops += 1
+
+    updatedUser = await userDatabase.userDatabaseHelper.updateOne(
+      {
+        _id: userId
+      },
+      {
+        $set: {
+          noOfShops: noOfShops
+        }
+      }
+    )
+
     const userWithoutPassword = await userDatabase.userDatabaseHelper.extractUserDetails(updatedUser)
+    
     const extractedShop = await shopDatabase.extractShopDetails(newShop)
 
     responseHandler.statusCode = 201;
@@ -178,6 +206,9 @@ const getVendorSingleShop = errorUtilities.withErrorHandling(
         shopCategory: 1,
         legalAddressOfBusiness: 1,
         isBlacklisted: 1,
+        displayImage: 1,
+        noOfProducts: 1,
+        isActive: 1
       }
     );
 
@@ -215,6 +246,9 @@ const getAllVendorShops = errorUtilities.withErrorHandling(
         shopCategory: 1,
         legalAddressOfBusiness: 1,
         isBlacklisted: 1,
+        displayImage: 1,
+        noOfProducts: 1,
+        isActive: 1
       }
     );
 
@@ -371,11 +405,11 @@ const updateShopImage = errorUtilities.withErrorHandling(
       message: "",
     };
 
-    const newImage = request?.file?.path
+    const displayImage = request?.file?.path
 
     const { shopId } = request.body
 
-    if (!newImage) {
+    if (!displayImage) {
       throw errorUtilities.createError("Select an image please", 400);
     }
 
@@ -384,7 +418,7 @@ const updateShopImage = errorUtilities.withErrorHandling(
         _id: shopId,
       },
       {
-        $set: { displayImage : newImage }
+        $set: { displayImage }
       }
     );
 

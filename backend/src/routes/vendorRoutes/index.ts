@@ -3,7 +3,7 @@ import { joiValidators } from '../../validations';
 import { generalAuthFunction, rolePermit } from '../../middlewares/authorization.middleware';
 import { vendorShopController, vendorProductController } from '../../controllers/index';
 import { cloudinaryUpload } from '../../utilities';
-import { Roles } from 'models/users/usersModel';
+import { Roles } from '../../models/users/usersModel';
 
 const router = express.Router();
 
@@ -20,14 +20,14 @@ router.put('/update-shop-image', generalAuthFunction, rolePermit([Roles.Vendor])
 
 
 //Product Routes
-router.post('/create-product', generalAuthFunction, rolePermit([Roles.Vendor]), vendorProductController.createProduct)
+router.post('/create-product', generalAuthFunction, rolePermit([Roles.Vendor]), cloudinaryUpload.single("productImage"), vendorProductController.createProduct)
 router.put('/update-product/:productId', generalAuthFunction, rolePermit([Roles.Vendor]), vendorProductController.updateProduct)
 router.get('/get-single-product/:productId', generalAuthFunction, rolePermit([Roles.Vendor]), vendorProductController.vendorSingleProduct)
 router.get('/get-all-products/:shopId', generalAuthFunction, rolePermit([Roles.Vendor]), vendorProductController.allVendorProductsForAShop)
 router.delete('/delete-single-product', generalAuthFunction, rolePermit([Roles.Vendor]), vendorProductController.deleteVendorSingleProduct)
 router.delete('/delete-many-products', generalAuthFunction, rolePermit([Roles.Vendor]), vendorProductController.deleteManyVendorShopProducts)
 router.post('/change-product-status', generalAuthFunction, rolePermit([Roles.Vendor]), vendorProductController.changeVendorProductStatus)
-router.put('/update-product-image', generalAuthFunction, rolePermit([Roles.Vendor]), cloudinaryUpload.single("displayImage"), vendorProductController.updateVendorProductImage)
+router.put('/update-product-image', generalAuthFunction, rolePermit([Roles.Vendor]), cloudinaryUpload.single("productImage"), vendorProductController.updateVendorProductImage)
 
 
 export default router;

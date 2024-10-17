@@ -14,7 +14,7 @@ const inputValidator = (schema: Joi.Schema):any => {
             message: `${error.details[0].message.replace(/["\\]/g, '')}`,
           });
         }
-        return next(); // Ensure next is called if no error
+        return next();
       } catch (err) {
         return response.status(500).json({
           status: 'error',

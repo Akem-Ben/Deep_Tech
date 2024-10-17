@@ -61,6 +61,11 @@ const shopSchema = new mongoose.Schema({
     required: [true, "A shop display image is required"]
   },
 
+  noOfProducts: {
+    type: Number,
+    default: 0
+  },
+
   isActive: {
     type: Boolean,
     default: true,

@@ -40,6 +40,11 @@ const userSchema = new mongoose.Schema({
     default: false,
   },
 
+  noOfShops: {
+    type: Number,
+    default: 0,
+  },
+
   isBlacklisted: {
     type: Boolean,
     default: false,

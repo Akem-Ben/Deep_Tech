@@ -1,6 +1,6 @@
 import express from 'express';
 import { joiValidators } from '../../validations';
-import { userAuthController, cartController } from '../../controllers';
+import { userAuthController, cartController, userProductControllers } from '../../controllers';
 import { generalAuthFunction } from '../../middlewares/authorization.middleware';
 
 const router = express.Router();
@@ -17,5 +17,13 @@ router.post('/add-cart-item', joiValidators.inputValidator(joiValidators.cartSch
 router.put('/update-cart-item', joiValidators.inputValidator(joiValidators.cartSchema), generalAuthFunction, cartController.updateItemInCart)
 router.delete('/delete-cart-item', joiValidators.inputValidator(joiValidators.cartItemDeleteSchema), generalAuthFunction, cartController.deleteItemFromCart)
 router.get('/get-cart', generalAuthFunction, cartController.getCartItems)
+
+
+//User Product and Shop Operations
+router.get('/all-products', generalAuthFunction, userProductControllers.userGetAllProducts)
+router.get('/all-shop-products/:shopId', generalAuthFunction, userProductControllers.allProductsForAShop)
+router.get('/single-product/:productId', generalAuthFunction, userProductControllers.getASingleProduct)
+router.get('/all-shops', generalAuthFunction, userProductControllers.getAllAvailableShops)
+
 
 export default router;

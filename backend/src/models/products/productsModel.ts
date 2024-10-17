@@ -61,6 +61,16 @@ const productSchema = new mongoose.Schema({
     required: [true, "Product image required"]
   },
 
+  numberOfSales: {
+    type: Number,
+    default: 0
+  },
+
+  ratings: {
+    type: Number,
+    default: 0
+  },
+
   isBlacklisted: {
     type: Boolean,
     default: false

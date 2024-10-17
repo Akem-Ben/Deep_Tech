@@ -88,6 +88,8 @@ const allVendorProductsForAShop = async (
 
   const { shopId } = request.params;
 
+  const { query } = request
+
   if (!user_id) {
     return responseUtilities.responseHandler(response, "Unauthorized", 400);
   }
@@ -101,7 +103,7 @@ const allVendorProductsForAShop = async (
   }
 
   const products = await vendorProductServices.getAllVendorProductsForAShop(
-    shopId
+    {shopId, query}
   );
 
   return responseUtilities.responseHandler(

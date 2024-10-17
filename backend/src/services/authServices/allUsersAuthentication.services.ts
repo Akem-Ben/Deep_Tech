@@ -113,8 +113,6 @@ const adminRegistrationService = errorUtilities.withErrorHandling(async (userPay
 
 });
 
-
-
 const userLogin = errorUtilities.withErrorHandling(async (loginPayload: Record<string, any>) => {
 
     const responseHandler: ResponseDetails = {
@@ -156,10 +154,7 @@ const userLogin = errorUtilities.withErrorHandling(async (loginPayload: Record<s
     };
 
     const accessToken = await generalHelpers.generateTokens(tokenPayload, "2h");
-    const refreshToken = await generalHelpers.generateTokens(
-      tokenPayload,
-      "30d"
-    );
+    const refreshToken = await generalHelpers.generateTokens(tokenPayload,"30d");
 
     existingUser.refreshToken = refreshToken;
 

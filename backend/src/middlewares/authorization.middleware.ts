@@ -2,7 +2,6 @@ import { Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import {APP_SECRET} from '../configurations/envKeys';
 import { generalHelpers, userDatabase } from '../helpers';
-import { errorUtilities } from '../utilities';
 
 export const generalAuthFunction = async (
   request: JwtPayload,
@@ -80,6 +79,7 @@ export const generalAuthFunction = async (
         const tokenPayload = {
           id: refreshVerifiedUser.id,
           email: refreshVerifiedUser.email,
+          role: refreshVerifiedUser.role
         };
 
         const newAccessToken = await generalHelpers.generateTokens(tokenPayload, '2h')

@@ -2,6 +2,7 @@ import { errorUtilities } from "../../utilities";
 import { Request } from "express";
 import { productDatabase, shopDatabase } from "../../helpers";
 import { ResponseDetails } from "../../types/utilities.types";
+import { queryFilter } from "../../helpers/generalHelpers/generalHelpers.helpers";
 
 const vendorCreateProductService = errorUtilities.withErrorHandling(
   async (
@@ -57,6 +58,21 @@ const vendorCreateProductService = errorUtilities.withErrorHandling(
     };
 
     const newProduct = await productDatabase.create(payload);
+
+    let productNumber = shop.noOfProducts
+
+    productNumber += 1
+
+    await shopDatabase.updateOne(
+      {
+        _id: shopId
+      },
+      {
+        $set: {
+          noOfProducts: productNumber
+        }
+      }
+    )
 
     const extractedProduct = await productDatabase.extractProductDetails(
       newProduct
@@ -184,6 +200,8 @@ const getVendorSingleProduct = errorUtilities.withErrorHandling(
         availableQuantity: 1,
         isAvailable: 1,
         productImage: 1,
+        numberOfSales: 1,
+        ratings: 1,
         isBlacklisted: 1
       }
     );
@@ -206,24 +224,44 @@ const getVendorSingleProduct = errorUtilities.withErrorHandling(
 
 const getAllVendorProductsForAShop = errorUtilities.withErrorHandling(
   async (queryDetails: Record<string, any>): Promise<any> => {
+
     const responseHandler: ResponseDetails = {
       statusCode: 0,
       message: "",
     };
 
+    const query = await queryFilter(queryDetails.query || {});
+
+    const size = Number(queryDetails.query.size) || 10;
+    
+    const skip = (Number(queryDetails.query.page) - 1) * size || 0;
+
     const { shopId } = queryDetails;
 
-    const products = await productDatabase.getMany(
-      { shopId: shopId },
-      {
-        shopName: 1,
-        businessLegalName: 1,
-        businessLicenseNumber: 1,
-        shopCategory: 1,
-        legalAddressOfBusiness: 1,
-        isBlacklisted: 1,
-      }
-    );
+    const filter = {
+      ...query,
+      shopId,
+    };
+
+    const options = {
+      skip,
+      limit: size,
+    };
+
+    const projection = {
+      productName: 1,
+      productCategory: 1,
+      shopId: 1,
+      cost: 1,
+      availableQuantity: 1,
+      isAvailable: 1,
+      productImage: 1,
+      numberOfSales: 1,
+      ratings: 1,
+      isBlacklisted: 1
+    };
+
+    const products = await productDatabase.getMany(filter, projection, options);
 
     if (!products || products.length === 0) {
       throw errorUtilities.createError(
@@ -375,9 +413,9 @@ const updateProductImage = errorUtilities.withErrorHandling(
       message: "",
     };
 
-    const newImage = request?.file?.path;
+    const productImage = request?.file?.path;
 
-    if (!newImage) {
+    if (!productImage) {
         throw errorUtilities.createError("Select an image please", 400);
       }
 
@@ -397,7 +435,7 @@ const updateProductImage = errorUtilities.withErrorHandling(
         _id: productId,
       },
       {
-        $set: { productImage: newImage },
+        $set: { productImage },
       }
     );
 

@@ -1,7 +1,13 @@
 import mongoose from "mongoose";
 
+
+export enum Roles {
+  Admin = "Admin",
+  User = "User",
+  Vendor = "Vendor"
+}
 const userSchema = new mongoose.Schema({
-  //   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+
   name: {
     type: String,
     required: [true, "Name is required"],
@@ -15,6 +21,7 @@ const userSchema = new mongoose.Schema({
 
   role: {
     type: String,
+    enum: Object.values(Roles),
     required: true,
   },
 
@@ -31,6 +38,11 @@ const userSchema = new mongoose.Schema({
   isVerified: {
     type: Boolean,
     default: false,
+  },
+
+  noOfShops: {
+    type: Number,
+    default: 0,
   },
 
   isBlacklisted: {

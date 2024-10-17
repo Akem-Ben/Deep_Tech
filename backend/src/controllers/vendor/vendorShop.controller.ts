@@ -1,21 +1,21 @@
 import {Request, Response} from 'express';
-import { cartService, vendorShopService } from '../../services';
+import { vendorShopService } from '../../services';
 import { responseUtilities } from '../../utilities';
 import { JwtPayload } from 'jsonwebtoken';
 
 const createShop = async(request:JwtPayload, response:Response):Promise<any> => {
 
-    const user_id = request.user._id;
+    const userId = request.user.id;
 
-    if(!user_id){
+    if(!userId){
         return responseUtilities.responseHandler(response, 'Unauthorized', 401);
     }
 
-    const body = {...request.body, user_id}
+    const body = {...request.body, userId}
 
     const shop:any = await vendorShopService.createVendorShopService(body, request)
 
-    return responseUtilities.responseHandler(response, shop.message, shop.statusCode, shop.data)
+    return responseUtilities.responseHandler(response, shop.message, shop.statusCode, shop.details, shop.data)
 }
 
 const updateShop = async (request: JwtPayload, response: Response): Promise<any> => {

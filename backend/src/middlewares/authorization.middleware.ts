@@ -16,7 +16,7 @@ export const generalAuthFunction = async (
 
     if (!authorizationHeader) {
       return response.status(401).json({
-        message: 'No Authorization header provided',
+        message: 'No Authorization header provided, please login again',
       });
     }
 

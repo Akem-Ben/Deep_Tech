@@ -6,6 +6,7 @@ import {
   userDatabase,
 } from "../../helpers";
 import { ResponseDetails } from "../../types/utilities.types";
+import { Categories } from '../../models/shops/shopModel';
 
 const createVendorShopService = errorUtilities.withErrorHandling(
 

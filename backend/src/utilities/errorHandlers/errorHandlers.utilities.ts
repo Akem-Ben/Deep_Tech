@@ -24,7 +24,7 @@ const withErrorHandling = (fn: Function) => async (...args: any) => {
       if (error.isOperational) {
         return createError(error.message, error.statusCode);
       }
-
+      console.log('err',error.message)
       return createUnknownError(error);
     }
   };
@@ -36,6 +36,7 @@ const withErrorHandling = (fn: Function) => async (...args: any) => {
       status: "error",
       message: errorResponse.message,
       timestamp: errorResponse.timestamp,
+      details: !err.isOperational ? `${err.message}` : ""
     });
 };
 

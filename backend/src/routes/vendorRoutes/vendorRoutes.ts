@@ -9,7 +9,7 @@ const router = express.Router();
 
 
 //Shop Routes
-router.post('/create-shop', joiValidators.inputValidator(joiValidators.createShopSchema), generalAuthFunction, cloudinaryUpload.single("displayImage"), vendorShopController.createShop)
+router.post('/create-shop', cloudinaryUpload.single("displayImage"), joiValidators.inputValidator(joiValidators.createShopSchema), generalAuthFunction, vendorShopController.createShop)
 router.put('/update-shop', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.updateShop)
 router.get('/get-single-shop/:shopId', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.getVendorSingleShop)
 router.get('/get-all-shops', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.getAllVendorShops)

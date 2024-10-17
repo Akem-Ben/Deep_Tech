@@ -14,6 +14,7 @@ const userRegisterWithEmail = async (
     response,
     newUser.message,
     newUser.statusCode,
+    newUser.details,
     newUser.data
   );
 };
@@ -24,15 +25,18 @@ const userLoginWithEmail = async (
 ): Promise<any> => {
   const loggedInUser: any = await userAuthService.userLogin(request.body);
 
+  if(loggedInUser.statusCode === 200){
   response
     .header("x-access-token", loggedInUser.data.accessToken)
     .header("x-refresh-token", loggedInUser.data.refreshToken);
-
+  }
+  
   return responseUtilities.responseHandler(
     response,
     loggedInUser.message,
     loggedInUser.statusCode,
-    loggedInUser.data
+    loggedInUser.details,
+    loggedInUser.data,
   );
 };
 
@@ -49,6 +53,7 @@ const userVerifiesAccountWithEmail = async (
     response,
     verification.message,
     verification.statusCode,
+    verification.details,
     verification.data
   );
 
@@ -71,6 +76,7 @@ const userResendsVerificationLink = async (
     response,
     resendLink.message,
     resendLink.statusCode,
+    resendLink.details,
     resendLink.data
   );
 

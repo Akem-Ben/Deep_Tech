@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-enum Categories {
+export enum Categories {
   Electronics = "Electronics",
   Fashion = "Fashion",
   HomeAndGarden = "Home and Garden",

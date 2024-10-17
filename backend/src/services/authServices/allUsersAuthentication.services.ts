@@ -7,7 +7,6 @@ import { USERS_APP_BASE_URL } from '../../configurations/envKeys';
 const userRegistrationService = errorUtilities.withErrorHandling(async (
   userPayload: Record<string, any>
 ): Promise<any> => {
-
     const responseHandler: ResponseDetails = {
       statusCode: 0,
       message: "",
@@ -54,7 +53,7 @@ const userRegistrationService = errorUtilities.withErrorHandling(async (
 
     await cartDatabase.create({ userId: newUser._id, items: [] });
 
-    await mailUtilities.sendMail(newUser.email, "Click the button below to verify your account", "PLEASE VERIFY YOUR ACCOUNT", `${USERS_APP_BASE_URL}/verification/${verificationToken}`);
+    await mailUtilities.sendMail(newUser.email, "Click the button below to verify your account", "PLEASE VERIFY YOUR ACCOUNT", `${USERS_APP_BASE_URL}/verification/${verificationToken}, Verify`);
 
     const userWithoutPassword = await userDatabase.userDatabaseHelper.extractUserDetails(newUser)
 
@@ -225,7 +224,7 @@ const resendVerificationLinkService = errorUtilities.withErrorHandling(async (em
     message: "",
   };
 
-  const user = await userDatabase.userDatabaseHelper.getOne(email);
+  const user = await userDatabase.userDatabaseHelper.getOne({email});
 
   if (!user) {
     throw errorUtilities.createError(`${email} does not exist`, 404);

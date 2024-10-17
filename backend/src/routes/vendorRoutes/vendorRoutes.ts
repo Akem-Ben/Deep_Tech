@@ -15,7 +15,7 @@ router.get('/get-single-shop/:shopId', generalAuthFunction, rolePermit([Roles.Ve
 router.get('/get-all-shops', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.getAllVendorShops)
 router.delete('/delete-single-shop/:shopId', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.deleteSingleVendorShop)
 router.delete('/delete-many-shops', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.deleteManyVendorShops)
-router.post('/deactivate-shop/:shopId', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.changeVendorShopStatus)
+router.get('/change-shop-status/:shopId', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.changeVendorShopStatus)
 router.put('/update-shop-image', generalAuthFunction, rolePermit([Roles.Vendor]), cloudinaryUpload.single("displayImage"), vendorShopController.updateShopImage)
 
 

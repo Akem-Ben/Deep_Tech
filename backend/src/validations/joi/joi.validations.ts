@@ -52,7 +52,7 @@ const cartItemDeleteSchema = Joi.object({
 })
 
 
-//Shops
+//Shops & Products
 const createShopSchema = Joi.object({
   shopName:  Joi.string().required(),
   businessLegalName: Joi.string().required(),
@@ -61,29 +61,16 @@ const createShopSchema = Joi.object({
   legalAddressOfBusiness: Joi.string().required(),
   displayImage: Joi.string().required()
 })
-// const facebookLoginSchema = Joi.object({
-//   facebookId: Joi.string().required().email()
-// })
 
-// const resetPasswordInitiationSchema = Joi.object({
-//   email: Joi.string().required().email()
-// })
 
-// const resetPassword = Joi.object({
-//   password: Joi.string().min(8).pattern(PASSWORD_PATTERN).required().messages({
-//     'string.pattern.base': 'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.'
-//   }),
-//   token: Joi.string().required()
-// })
+const createProductSchema = Joi.object({
+    productName: Joi.string().required(),
+    productCategory: Joi.string().required(),
+    shopId: Joi.string().required(),
+    cost: Joi.number().required(),
+    availableQuantity: Joi.number().required(),
 
-// const instagramAuthSchema = Joi.object({
-//   instagram_user_name: Joi.string().required(),
-//   instagram_id: Joi.string().required(),
-//   instagram_account_type: Joi.string().optional(),
-//   short_lived_token: Joi.string().optional(),
-//   long_lived_token: Joi.string().required(),
-//   token_expiry_date: Joi.date().required()
-// })
+})
 
 export default {
   userRegisterSchemaViaEmail,
@@ -91,10 +78,6 @@ export default {
   cartSchema,
   cartItemDeleteSchema,
   createShopSchema,
-//   facebookAuthSchema,
-//   facebookLoginSchema,
-//   resetPasswordInitiationSchema,
-//   resetPassword,
-//   instagramAuthSchema,
+  createProductSchema,
   inputValidator
 }

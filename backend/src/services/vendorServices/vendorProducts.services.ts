@@ -48,13 +48,21 @@ const vendorCreateProductService = errorUtilities.withErrorHandling(
       );
     }
 
+    const productImage = request?.file?.path
+
+    if(!productImage){
+      throw errorUtilities.createError(
+        "You product must have a picture",
+        400
+      )
+    }
     const payload = {
       productName,
       productCategory,
       shopId,
       cost,
       availableQuantity,
-      productImage: request?.file?.path,
+      productImage
     };
 
     const newProduct = await productDatabase.create(payload);

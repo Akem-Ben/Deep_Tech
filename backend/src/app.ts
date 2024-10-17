@@ -33,7 +33,7 @@ app.use(compression());
 // Set Cors
 app.use(cors());
 
-
+//Other Middlewares
 app.use(bodyParser.json());
 app.use(logger("dev"));
 app.use(express.json());
@@ -56,7 +56,7 @@ app.use("/api", apiRouter);
 
 // Health Check Endpoint
 app.get("/", (request: Request, response: Response) => {
-  response.send("Welcome to PlentyChat API 👋");
+  response.send("Welcome to Deep Tech Assessment 👋");
 });
 
 

@@ -104,18 +104,12 @@ const createVendorShopService = errorUtilities.withErrorHandling(
     );
   }
 
-    let noOfShops = user.noOfShops
-
-    noOfShops += 1
-
     updatedUser = await userDatabase.userDatabaseHelper.updateOne(
       {
         _id: userId
       },
-      {
-        $set: {
-          noOfShops: noOfShops
-        }
+      { 
+        $inc: { noOfShops: +1 } 
       }
     )
 
@@ -369,9 +363,16 @@ const deleteManyVendorShops = errorUtilities.withErrorHandling(
       );
     }
 
+    const operations = [
+      async (session: ClientSession) => {
     await productDatabase.deleteMany({ shopId: { $in: shops } });
-
+      },
+      async (session: ClientSession) => {
     await shopDatabase.deleteMany({ _id: { $in: shops } });
+      }
+    ]
+
+    await performTransaction(operations);
 
     responseHandler.statusCode = 200;
     responseHandler.message = "Shops deleted successfully";

@@ -216,7 +216,6 @@ const verifyUserAccount = errorUtilities.withErrorHandling(async (verificationTo
 
 });
 
-
 const resendVerificationLinkService = errorUtilities.withErrorHandling(async (email: string): Promise<any> => {
 
   const responseHandler: ResponseDetails = {

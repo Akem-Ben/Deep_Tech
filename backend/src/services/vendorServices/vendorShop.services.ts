@@ -1,11 +1,14 @@
 import { mailUtilities, errorUtilities } from "../../utilities";
 import { Request } from 'express';
 import {
+  generalHelpers,
   productDatabase,
   shopDatabase,
   userDatabase,
 } from "../../helpers";
 import { ResponseDetails } from "../../types/utilities.types";
+import { ClientSession } from 'mongoose';
+import { performTransaction } from '../../middlewares/databaseTransactions.middleware';
 
 const createVendorShopService = errorUtilities.withErrorHandling(
 
@@ -71,7 +74,22 @@ const createVendorShopService = errorUtilities.withErrorHandling(
 
     let updatedUser:any;
 
+    let accessToken:any;
+
+    let refreshToken:any;
+
     if(user.role === 'User'){
+
+
+    let tokenPayload = {
+      id: userId,
+      role: "Vendor",
+      email: user.email
+    }
+
+     accessToken = await generalHelpers.generateTokens(tokenPayload, '2h')
+
+     refreshToken = await generalHelpers.generateTokens(tokenPayload, '30d')
 
      updatedUser = await userDatabase.userDatabaseHelper.updateOne(
       {
@@ -80,24 +98,18 @@ const createVendorShopService = errorUtilities.withErrorHandling(
       {
         $set: {
           role: "Vendor",
+          refreshToken
         },
       }
     );
-
   }
-
-    let noOfShops = user.noOfShops
-
-    noOfShops += 1
 
     updatedUser = await userDatabase.userDatabaseHelper.updateOne(
       {
         _id: userId
       },
-      {
-        $set: {
-          noOfShops: noOfShops
-        }
+      { 
+        $inc: { noOfShops: +1 } 
       }
     )
 
@@ -110,6 +122,8 @@ const createVendorShopService = errorUtilities.withErrorHandling(
     responseHandler.data = {
       shop: extractedShop,
       user: userWithoutPassword,
+      accessToken: accessToken,
+      refreshToken: refreshToken
     };
     return responseHandler;
   }
@@ -142,7 +156,7 @@ const updateShopService = errorUtilities.withErrorHandling(
       throw errorUtilities.createError("Shop not found. Please try again", 404);
     }
 
-    if (shop.ownerId !== userId) {
+    if (shop.ownerId != userId) {
       throw errorUtilities.createError("You can only update your shop(s)", 401);
     }
 
@@ -276,23 +290,37 @@ const deleteSingleVendorShop = errorUtilities.withErrorHandling(
     };
 
     const { shopId, userId } = deleteDetails;
+    
+    const shop = await shopDatabase.getOne({_id:shopId});
 
-    const shop = await shopDatabase.getOne(shopId);
-
+    
     if (!shop) {
       throw errorUtilities.createError("Shop not found", 404);
     }
-    if (shop.ownerId !== userId) {
+
+    if (shop.ownerId != userId) {
       throw errorUtilities.createError(
         "You are not the owner of this shop.",
         403
       );
     }
 
-    
-    await shopDatabase.deleteOne(shopId);
-    
-    await productDatabase.deleteMany({shopId:shopId})
+    const operations = [
+      async (session: ClientSession) => {
+        await shopDatabase.deleteOne(shopId);
+      },
+      async (session: ClientSession) => {
+        await productDatabase.deleteMany({ shopId: shopId });
+      },
+      async (session: ClientSession) => {
+        await userDatabase.userDatabaseHelper.updateOne(
+          { _id: userId },
+          { $inc: { noOfShops: -1 } }
+        );
+      },
+    ];
+
+    await performTransaction(operations);
 
     responseHandler.statusCode = 200;
     responseHandler.message = "Shop deleted successfully";
@@ -335,11 +363,16 @@ const deleteManyVendorShops = errorUtilities.withErrorHandling(
       );
     }
 
-    const validShopIds = shops.map(shop => shop._id);
+    const operations = [
+      async (session: ClientSession) => {
+    await productDatabase.deleteMany({ shopId: { $in: shops } });
+      },
+      async (session: ClientSession) => {
+    await shopDatabase.deleteMany({ _id: { $in: shops } });
+      }
+    ]
 
-    await productDatabase.deleteMany({ shopId: { $in: validShopIds } });
-
-    await shopDatabase.deleteMany({ _id: { $in: validShopIds } });
+    await performTransaction(operations);
 
     responseHandler.statusCode = 200;
     responseHandler.message = "Shops deleted successfully";
@@ -362,7 +395,7 @@ const vendorDeactivateOrReactivateShop = errorUtilities.withErrorHandling(
     throw errorUtilities.createError('Shop not found', 404);
   }
 
-  if (shop.ownerId !== userId) {
+  if (shop.ownerId != userId) {
     throw errorUtilities.createError('You are not the owner of this shop.', 403);
   }
 

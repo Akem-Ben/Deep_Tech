@@ -9,13 +9,13 @@ const router = express.Router();
 
 
 //Shop Routes
-router.post('/create-shop', joiValidators.inputValidator(joiValidators.createShopSchema), generalAuthFunction, cloudinaryUpload.single("displayImage"), vendorShopController.createShop)
+router.post('/create-shop', cloudinaryUpload.single("displayImage"), joiValidators.inputValidator(joiValidators.createShopSchema), generalAuthFunction, vendorShopController.createShop)
 router.put('/update-shop', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.updateShop)
 router.get('/get-single-shop/:shopId', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.getVendorSingleShop)
 router.get('/get-all-shops', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.getAllVendorShops)
 router.delete('/delete-single-shop/:shopId', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.deleteSingleVendorShop)
 router.delete('/delete-many-shops', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.deleteManyVendorShops)
-router.post('/deactivate-shop/:shopId', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.changeVendorShopStatus)
+router.get('/change-shop-status/:shopId', generalAuthFunction, rolePermit([Roles.Vendor]), vendorShopController.changeVendorShopStatus)
 router.put('/update-shop-image', generalAuthFunction, rolePermit([Roles.Vendor]), cloudinaryUpload.single("displayImage"), vendorShopController.updateShopImage)
 
 

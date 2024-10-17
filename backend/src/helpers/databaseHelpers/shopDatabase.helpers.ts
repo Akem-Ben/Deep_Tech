@@ -74,6 +74,7 @@ const shopDatabaseHelper = {
         legalAddressOfBusiness: shopData.legalAddressOfBusiness,
         isActive: shopData.isActive,
         isBlacklisted: shopData.isBlacklisted,
+        displayImage: shopData.displayImage
       }
       
     }catch (error:any) {

@@ -16,6 +16,7 @@ const responseHandler = (
   response: Response,
   message: string,
   statusCode: number,
+  details?: any,
   data?: any,
 ) => {
 
@@ -23,6 +24,7 @@ const responseHandler = (
     status: statusCode === 201 || statusCode === 200 ? "success" : "error",
     message: message,
     data: data || null,
+    details
   });
 };
 

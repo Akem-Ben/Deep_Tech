@@ -18,7 +18,7 @@ const sendMail = async (
   message: string, 
   subject: string, 
   actionLink?: string, 
-  actionText: string = 'Click here'
+  actionText?: string
 ) => {
   try {
     const mailOptions = {

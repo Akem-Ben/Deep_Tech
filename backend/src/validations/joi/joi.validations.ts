@@ -67,10 +67,8 @@ const createShopSchema = Joi.object({
 const createProductSchema = Joi.object({
     productName: Joi.string().required(),
     productCategory: Joi.string().required(),
-    shopId: Joi.string().required(),
     cost: Joi.number().required(),
-    availableQuantity: Joi.number().required(),
-
+    availableQuantity: Joi.number().required()
 })
 
 export default {

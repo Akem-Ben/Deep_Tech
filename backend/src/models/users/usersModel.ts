@@ -45,6 +45,11 @@ const userSchema = new mongoose.Schema({
     default: 0,
   },
 
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+
   isBlacklisted: {
     type: Boolean,
     default: false,

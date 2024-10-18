@@ -369,6 +369,14 @@ const deleteManyVendorShops = errorUtilities.withErrorHandling(
       },
       async (session: ClientSession) => {
     await shopDatabase.deleteMany({ _id: { $in: shops } });
+      },
+      async (session:ClientSession) => {
+    await userDatabase.userDatabaseHelper.updateOne(
+          { _id:userId }, 
+          {
+            $set: { noOfShops: -shops.length }
+          }
+        )
       }
     ]
 

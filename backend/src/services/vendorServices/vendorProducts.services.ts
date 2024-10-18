@@ -3,6 +3,8 @@ import { Request } from "express";
 import { productDatabase, shopDatabase } from "../../helpers";
 import { ResponseDetails } from "../../types/utilities.types";
 import { queryFilter } from "../../helpers/generalHelpers/generalHelpers.helpers";
+import { ClientSession } from "mongoose";
+import { performTransaction } from "../../middlewares/databaseTransactions.middleware";
 
 const vendorCreateProductService = errorUtilities.withErrorHandling(
   async (
@@ -30,31 +32,28 @@ const vendorCreateProductService = errorUtilities.withErrorHandling(
 
     const shop = await shopDatabase.getOne({ _id: shopId });
 
-    if (userId !== shop?.ownerId) {
-      throw errorUtilities.createError("This is not your shop", 404);
+    if (userId != shop?.ownerId) {
+      throw errorUtilities.createError("This is not your shop", 400);
     }
 
     if (!shop) {
       throw errorUtilities.createError(
         "You need to create a shop before you can create products",
-        404
+        400
       );
     }
 
     if (product) {
       throw errorUtilities.createError(
         "You already have a product with this name in your shop",
-        404
+        400
       );
     }
 
-    const productImage = request?.file?.path
+    const productImage = request?.file?.path;
 
-    if(!productImage){
-      throw errorUtilities.createError(
-        "You product must have a picture",
-        400
-      )
+    if (!productImage) {
+      throw errorUtilities.createError("You product must have a picture", 400);
     }
     const payload = {
       productName,
@@ -62,25 +61,19 @@ const vendorCreateProductService = errorUtilities.withErrorHandling(
       shopId,
       cost,
       availableQuantity,
-      productImage
+      productImage,
     };
 
     const newProduct = await productDatabase.create(payload);
 
-    let productNumber = shop.noOfProducts
-
-    productNumber += 1
-
     await shopDatabase.updateOne(
       {
-        _id: shopId
+        _id: shopId,
       },
       {
-        $set: {
-          noOfProducts: productNumber
-        }
+        $inc: { noOfProducts: +1 },
       }
-    )
+    );
 
     const extractedProduct = await productDatabase.extractProductDetails(
       newProduct
@@ -96,7 +89,6 @@ const vendorCreateProductService = errorUtilities.withErrorHandling(
 );
 
 const updateProductService = errorUtilities.withErrorHandling(
-
   async (updatePayload: Record<string, any>): Promise<any> => {
     const responseHandler: ResponseDetails = {
       statusCode: 0,
@@ -105,9 +97,10 @@ const updateProductService = errorUtilities.withErrorHandling(
 
     if (
       (!updatePayload.productName || updatePayload.productName === "") &&
-      (!updatePayload.productCategory || updatePayload.productCategory === "") &&
-      ( updatePayload.cost === null) &&
-      (updatePayload.availableQuantity === null)
+      (!updatePayload.productCategory ||
+        updatePayload.productCategory === "") &&
+      updatePayload.cost === null &&
+      updatePayload.availableQuantity === null
     ) {
       throw errorUtilities.createError(
         "At least one field must be selected for update",
@@ -117,10 +110,10 @@ const updateProductService = errorUtilities.withErrorHandling(
 
     const { userId, productId } = updatePayload;
 
-    const product = await productDatabase.getOne({_id:productId})
+    const product = await productDatabase.getOne({ _id: productId });
 
-    if(!product){
-        throw errorUtilities.createError("Product not found", 404)
+    if (!product) {
+      throw errorUtilities.createError("Product not found", 404);
     }
 
     const shop = await shopDatabase.getOne({ _id: product.shopId });
@@ -129,8 +122,11 @@ const updateProductService = errorUtilities.withErrorHandling(
       throw errorUtilities.createError("Shop not found. Please try again", 404);
     }
 
-    if (shop.ownerId !== userId) {
-      throw errorUtilities.createError("You can only update products in your shop(s)", 400);
+    if (shop.ownerId != userId) {
+      throw errorUtilities.createError(
+        "You can only update products in your shop(s)",
+        400
+      );
     }
 
     if (shop.isBlacklisted) {
@@ -141,11 +137,11 @@ const updateProductService = errorUtilities.withErrorHandling(
     }
 
     if (product.isBlacklisted) {
-        throw errorUtilities.createError(
-          "This product has been blocked. Please contact support on info@naijamade.com",
-          400
-        );
-      }
+      throw errorUtilities.createError(
+        "This product has been blocked. Please contact support on info@naijamade.com",
+        400
+      );
+    }
 
     let updateDetails: Record<string, any> = {};
 
@@ -158,14 +154,12 @@ const updateProductService = errorUtilities.withErrorHandling(
     }
 
     if (updatePayload.cost) {
-      updateDetails.cost =
-        updatePayload.cost;
+      updateDetails.cost = updatePayload.cost;
     }
 
     if (updatePayload.availableQuantity) {
-        updateDetails.availableQuantity =
-          updatePayload.availableQuantity;
-      }
+      updateDetails.availableQuantity = updatePayload.availableQuantity;
+    }
 
     const newProduct: any = await productDatabase.updateOne(
       {
@@ -176,7 +170,9 @@ const updateProductService = errorUtilities.withErrorHandling(
       }
     );
 
-    const extractedShop = await productDatabase.extractProductDetails(newProduct);
+    const extractedShop = await productDatabase.extractProductDetails(
+      newProduct
+    );
 
     responseHandler.statusCode = 200;
     responseHandler.message = "Product updated successfully";
@@ -188,9 +184,7 @@ const updateProductService = errorUtilities.withErrorHandling(
 );
 
 const getVendorSingleProduct = errorUtilities.withErrorHandling(
-
   async (queryDetails: Record<string, any>): Promise<any> => {
-
     const responseHandler: ResponseDetails = {
       statusCode: 0,
       message: "",
@@ -210,7 +204,7 @@ const getVendorSingleProduct = errorUtilities.withErrorHandling(
         productImage: 1,
         numberOfSales: 1,
         ratings: 1,
-        isBlacklisted: 1
+        isBlacklisted: 1,
       }
     );
 
@@ -224,7 +218,7 @@ const getVendorSingleProduct = errorUtilities.withErrorHandling(
     responseHandler.statusCode = 200;
     responseHandler.message = "Product fetched successfully";
     responseHandler.data = {
-        product,
+      product,
     };
     return responseHandler;
   }
@@ -232,7 +226,6 @@ const getVendorSingleProduct = errorUtilities.withErrorHandling(
 
 const getAllVendorProductsForAShop = errorUtilities.withErrorHandling(
   async (queryDetails: Record<string, any>): Promise<any> => {
-
     const responseHandler: ResponseDetails = {
       statusCode: 0,
       message: "",
@@ -241,7 +234,7 @@ const getAllVendorProductsForAShop = errorUtilities.withErrorHandling(
     const query = await queryFilter(queryDetails.query || {});
 
     const size = Number(queryDetails.query.size) || 10;
-    
+
     const skip = (Number(queryDetails.query.page) - 1) * size || 0;
 
     const { shopId } = queryDetails;
@@ -266,7 +259,7 @@ const getAllVendorProductsForAShop = errorUtilities.withErrorHandling(
       productImage: 1,
       numberOfSales: 1,
       ratings: 1,
-      isBlacklisted: 1
+      isBlacklisted: 1,
     };
 
     const products = await productDatabase.getMany(filter, projection, options);
@@ -281,7 +274,7 @@ const getAllVendorProductsForAShop = errorUtilities.withErrorHandling(
     responseHandler.statusCode = 200;
     responseHandler.message = "products fetched successfully";
     responseHandler.data = {
-        products,
+      products,
     };
     return responseHandler;
   }
@@ -296,24 +289,37 @@ const deleteSingleVendorProduct = errorUtilities.withErrorHandling(
 
     const { shopId, userId, productId } = deleteDetails;
 
-    const shop = await shopDatabase.getOne(shopId);
+    const shop = await shopDatabase.getOne({ _id: shopId });
 
     if (!shop) {
       throw errorUtilities.createError("Shop not found", 404);
     }
-    if (shop.ownerId !== userId) {
+    if (shop.ownerId != userId) {
       throw errorUtilities.createError(
         "You are not the owner of this shop. You cannot delete the product",
         403
       );
     }
 
-    const product = await productDatabase.getOne({_id:productId})
+    const product = await productDatabase.getOne({ _id: productId });
 
-    if(!product){
-        throw errorUtilities.createError("Product not found", 404)
+    if (!product) {
+      throw errorUtilities.createError("Product not found", 404);
     }
-    await productDatabase.deleteOne({_id:productId})
+
+    const operations = [
+      async (session: ClientSession) => {
+        await productDatabase.deleteOne({ _id: productId });
+      },
+      async (session: ClientSession) => {
+        await shopDatabase.updateOne(
+          { _id: shopId },
+          { $inc: { noOfProducts: -1 } }
+        );
+      },
+    ];
+
+    await performTransaction(operations);
 
     responseHandler.statusCode = 200;
     responseHandler.message = "Product deleted successfully";
@@ -343,13 +349,19 @@ const deleteManyVendorProductsForAShop = errorUtilities.withErrorHandling(
     );
 
     if (!shop) {
-      throw errorUtilities.createError(
-        "Shop not found.",
-        404
-      );
+      throw errorUtilities.createError("Shop not found.", 404);
     }
 
-    await productDatabase.deleteMany({ _id: { $in: productIds } });
+    const operations = [
+      async (session: ClientSession) => {
+    await productDatabase.deleteMany({ _id: { $in: productIds } })
+      },
+      async (session: ClientSession) => {
+    await shopDatabase.updateOne({_id:shopId},{ $inc: { noOfProducts: -1 } })
+      }
+    ]
+
+    await performTransaction(operations);
 
     responseHandler.statusCode = 200;
     responseHandler.message = "Products deleted successfully";
@@ -372,13 +384,13 @@ const vendorDeactivateOrReactivateProduct = errorUtilities.withErrorHandling(
       throw errorUtilities.createError("Product not found", 404);
     }
 
-    const shop = await shopDatabase.getOne({ _id: shopId })
+    const shop = await shopDatabase.getOne({ _id: shopId });
 
-    if(!shop){
-        throw errorUtilities.createError("Shop not found", 404)
+    if (!shop) {
+      throw errorUtilities.createError("Shop not found", 404);
     }
 
-    if (shop.ownerId !== userId) {
+    if (shop.ownerId != userId) {
       throw errorUtilities.createError(
         "You are not the owner of this shop.",
         403
@@ -399,12 +411,14 @@ const vendorDeactivateOrReactivateProduct = errorUtilities.withErrorHandling(
       );
     }
 
-    const extractedProduct = await productDatabase.extractProductDetails(updatedProduct);
+    const extractedProduct = await productDatabase.extractProductDetails(
+      updatedProduct
+    );
 
     responseHandler.statusCode = 200;
     responseHandler.message = `${
       extractedProduct.isAvailable
-        ? "Product activated successfully"
+        ? "Product reactivated successfully"
         : "Product deactivated successfully"
     }`;
     responseHandler.data = {
@@ -424,18 +438,18 @@ const updateProductImage = errorUtilities.withErrorHandling(
     const productImage = request?.file?.path;
 
     if (!productImage) {
-        throw errorUtilities.createError("Select an image please", 400);
-      }
+      throw errorUtilities.createError("Select an image please", 400);
+    }
 
-    const { productId } = request.body;
+    const { productId } = request.params;
 
-    const productCheck = await productDatabase.getOne({ _id: productId }, { _id: 1 })
+    const productCheck = await productDatabase.getOne(
+      { _id: productId },
+      { _id: 1 }
+    );
 
-    if(!productCheck){
-        throw errorUtilities.createError(
-            "Product not found",
-            404
-        )
+    if (!productCheck) {
+      throw errorUtilities.createError("Product not found", 404);
     }
 
     const newProduct: any = await productDatabase.updateOne(
@@ -447,12 +461,14 @@ const updateProductImage = errorUtilities.withErrorHandling(
       }
     );
 
-    const extractedShop = await productDatabase.extractProductDetails(newProduct);
+    const extractedProduct = await productDatabase.extractProductDetails(
+      newProduct
+    );
 
     responseHandler.statusCode = 200;
     responseHandler.message = "Shop image changed successfully";
     responseHandler.data = {
-      product: extractedShop,
+      product: extractedProduct,
     };
     return responseHandler;
   }

@@ -56,7 +56,7 @@ app.use("/api", apiRouter);
 
 // Health Check Endpoint
 app.get("/", (request: Request, response: Response) => {
-  response.send("Welcome to Deep Tech Assessment 👋");
+  response.send("Welcome to Deep Tech Industries' Backend Server. 👋");
 });
 
 

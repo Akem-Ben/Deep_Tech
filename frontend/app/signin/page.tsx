@@ -8,7 +8,7 @@ import { CircularProgress, IconButton } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import hero from '../public/hero.jpg';
+import hero from '../../public/hero.jpg';
 import { Facebook, Google } from '@mui/icons-material';
 
 const SignIn: React.FC = () => {

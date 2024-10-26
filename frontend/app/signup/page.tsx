@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { CircularProgress } from '@mui/material';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import hero from '../public/hero.jpg';
+import hero from '../../public/hero.jpg';
 import { Facebook, Google, Visibility, VisibilityOff } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 

@@ -29,7 +29,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
       id: product.id,
       title: product.title,
       price: product.price,
-      imageUrl: product.imageUrl,
+      imageUrl: product.imageUrl
     });
     addAlert("Product added to cart successful", "Proceed to checkout", "success")
   };

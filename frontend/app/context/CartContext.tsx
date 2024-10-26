@@ -7,7 +7,7 @@ interface CartItem {
   title: string;
   price: number;
   imageUrl: string;
-  quantity: number;
+  quantity?: number;
 }
 
 interface CartContextType {
@@ -38,11 +38,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [cartItems]);
 
   const addToCart = (item: CartItem) => {
-    const confirmItem = cartItems.find((element) => element.id === item.id);
+    const confirmItem:any = cartItems.find((element:any) => element.id === item.id);
   
     if (confirmItem) {
       setCartItems((prev) =>
-        prev.map((element) =>
+        prev.map((element:any) =>
           element.id === item.id
             ? { ...element, quantity: element.quantity + 1 }
             : element

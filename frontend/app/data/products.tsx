@@ -4,7 +4,7 @@ export const products = [
     title: 'Organic Avocado',
     price: 2.99,
     priceSlash: 3.49,
-    imageUrl: '/images/avocado.jpg',
+    imageUrl: '/avocado.jpg',
     category: 'fruits',
     description: 'A ripe, creamy organic avocado packed with healthy fats and essential nutrients.'
   },
@@ -13,7 +13,7 @@ export const products = [
     title: 'Fresh Strawberries',
     price: 3.49,
     priceSlash: 4.49,
-    imageUrl: '/images/strawberries.jpg',
+    imageUrl: '/strawberries.jpeg',
     category: 'fruits',
     description: 'Juicy, sweet strawberries that are perfect for snacking or adding to desserts.'
   },
@@ -22,7 +22,7 @@ export const products = [
     title: 'Almond Milk',
     price: 4.99,
     priceSlash: 5.99,
-    imageUrl: '/images/almond-milk.jpg',
+    imageUrl: '/almond-milk.jpg',
     category: 'beverages',
     description: 'Smooth and creamy almond milk, a delicious dairy-free alternative.'
   },
@@ -31,7 +31,7 @@ export const products = [
     title: 'Greek Yogurt',
     price: 1.89,
     priceSlash: 2.49,
-    imageUrl: '/images/greek-yogurt.jpg',
+    imageUrl: '/greek-yogurt.jpg',
     category: 'dairy',
     description: 'Thick and rich Greek yogurt with a tangy flavor, perfect for a protein-packed snack.'
   },
@@ -40,7 +40,7 @@ export const products = [
     title: 'Whole Wheat Bread',
     price: 2.49,
     priceSlash: 2.99,
-    imageUrl: '/images/wheat-bread.jpg',
+    imageUrl: '/wheat-bread.jpg',
     category: 'breads',
     description: 'Nutty and wholesome whole wheat bread, great for sandwiches or toast.'
   },
@@ -49,7 +49,7 @@ export const products = [
     title: 'Extra Virgin Olive Oil',
     price: 6.99,
     priceSlash: 7.99,
-    imageUrl: '/images/olive-oil.jpg',
+    imageUrl: '/olive-oil.jpeg',
     category: 'condiments',
     description: 'Premium extra virgin olive oil, perfect for cooking or drizzling over salads.'
   },
@@ -58,7 +58,7 @@ export const products = [
     title: 'Fresh Spinach',
     price: 1.99,
     priceSlash: 2.49,
-    imageUrl: '/images/spinach.jpg',
+    imageUrl: '/spinach.jpg',
     category: 'vegetables',
     description: 'Fresh and crisp spinach, loaded with vitamins and perfect for salads or cooking.'
   },
@@ -67,7 +67,7 @@ export const products = [
     title: 'Dark Chocolate',
     price: 2.99,
     priceSlash: 3.99,
-    imageUrl: '/images/dark-chocolate.jpg',
+    imageUrl: '/dark-chocolate.jpg',
     category: 'snacks',
     description: 'Rich and indulgent dark chocolate, a delicious treat with antioxidants.'
   },
@@ -76,7 +76,7 @@ export const products = [
     title: 'Chia Seeds',
     price: 5.49,
     priceSlash: 6.49,
-    imageUrl: '/images/chia-seeds.jpg',
+    imageUrl: '/chia-seeds.jpg',
     category: 'snacks',
     description: 'Nutrient-dense chia seeds, perfect for adding to smoothies or oatmeal.'
   },
@@ -85,7 +85,7 @@ export const products = [
     title: 'Coconut Water',
     price: 2.49,
     priceSlash: 3.29,
-    imageUrl: '/images/coconut-water.jpg',
+    imageUrl: '/coconut-water.jpg',
     category: 'beverages',
     description: 'Refreshing coconut water, naturally hydrating and packed with electrolytes.'
   },
@@ -94,7 +94,7 @@ export const products = [
     title: 'Quinoa',
     price: 4.99,
     priceSlash: 5.99,
-    imageUrl: '/images/quinoa.jpg',
+    imageUrl: '/quinoa.jpg',
     category: 'grains',
     description: 'Nutty and protein-rich quinoa, a versatile grain perfect for salads or bowls.'
   },
@@ -103,7 +103,7 @@ export const products = [
     title: 'Frozen Blueberries',
     price: 3.99,
     priceSlash: 4.99,
-    imageUrl: '/images/frozen-blueberries.jpg',
+    imageUrl: '/frozen-blueberries.jpg',
     category: 'fruits',
     description: 'Sweet and tangy frozen blueberries, perfect for smoothies or baking.'
   },
@@ -112,7 +112,7 @@ export const products = [
     title: 'Beef Jerky',
     price: 6.49,
     priceSlash: 7.49,
-    imageUrl: '/images/beef-jerky.jpg',
+    imageUrl: '/beef-jerky.jpg',
     category: 'snacks',
     description: 'Savory and protein-packed beef jerky, perfect for a quick and satisfying snack.'
   },
@@ -121,7 +121,7 @@ export const products = [
     title: 'Natural Peanut Butter',
     price: 4.49,
     priceSlash: 5.49,
-    imageUrl: '/images/peanut-butter.jpg',
+    imageUrl: '/peanut-butter.jpg',
     category: 'condiments',
     description: 'Creamy natural peanut butter, made with only the finest peanuts and no added sugar.'
   },
@@ -130,7 +130,7 @@ export const products = [
     title: 'Brown Rice',
     price: 3.49,
     priceSlash: 4.49,
-    imageUrl: '/images/brown-rice.jpg',
+    imageUrl: '/brown-rice.jpg',
     category: 'grains',
     description: 'Nutritious brown rice, a wholesome and fiber-rich staple for any meal.'
   },
@@ -139,7 +139,7 @@ export const products = [
     title: 'Oatmeal',
     price: 2.99,
     priceSlash: 3.99,
-    imageUrl: '/images/oatmeal.jpg',
+    imageUrl: '/oatmeal.jpg',
     category: 'grains',
     description: 'Hearty and filling oatmeal, perfect for a warm and nutritious breakfast.'
   },

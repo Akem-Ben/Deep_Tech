@@ -5,7 +5,7 @@ import { Delete } from '@mui/icons-material';
 import { ShoppingBasket } from 'lucide-react';
 
 const Cart: React.FC = () => {
-  const { itemCount, cartItems, removeFromCart } = useCart(); // Get removeFromCart from context
+  const { itemCount, cartItems, removeFromCart } = useCart();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleCart = () => {
@@ -32,12 +32,13 @@ const Cart: React.FC = () => {
           ) : (
             <ul>
               {cartItems.map((item) => (
-                <li key={item.id} className="flex items-center justify-between py-2">
+                <li key={item.id} className="flex items-center justify-between py-2 border mb-[2px] rounded-lg p-[5px]">
                   <div className="flex items-center">
                     <img src={item.imageUrl} alt={item.title} className="w-12 h-12 object-cover rounded-md mr-2" />
                     <div>
                       <p className="font-semibold text-gray-400">{item.title}</p>
                       <p className="text-sm text-gray-600">${item.price}</p>
+                      <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
                     </div>
                   </div>
                   <button onClick={() => removeFromCart(item.id)} className="text-red-500">

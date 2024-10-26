@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import heroImg from '../public/hero.jpg'
+import heroImg from '../../public/hero.jpg';
 
 const Hero: React.FC = () => {
   return (
